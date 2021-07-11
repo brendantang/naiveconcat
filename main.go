@@ -26,56 +26,6 @@ func (dict dictionary) get(word string) (d datum, ok bool) {
 	return
 }
 
-// dataType describes the internal type that a  datum has.
-type dataType int
-
-const (
-	tnumber dataType = iota
-	tword
-	tcommand
-)
-
-func (t dataType) String() (s string) {
-	switch t {
-	case tnumber:
-		s = "number"
-	case tword:
-		s = "word"
-	case tcommand:
-		s = "command"
-	}
-	return
-}
-
-// A datum represents a value.
-type datum struct {
-	dataType dataType
-	word     string
-	number   float64
-	command  command
-}
-
-// A command is an executable procedure.
-type command struct {
-	fn func(dictionary, stack) (dictionary, stack, error)
-}
-
-func (cmd command) execute(dict dictionary, s stack) (dictionary, stack, error) {
-	return cmd.fn(dict, s)
-}
-
-func (d datum) String() (s string) {
-	switch d.dataType {
-	case tnumber:
-		s = strconv.FormatFloat(d.number, 'f', -1, 64)
-	case tword:
-		s = d.word
-	case tcommand:
-		s = fmt.Sprintf("%#v", d.command)
-	}
-	return
-}
-
 // The stack is where data is stored while the program runs.
 // The stack is "first-in, last-out"—you can only store data by "pushing" it
 // onto the top, and you can only access data by "popping" it off the top.
