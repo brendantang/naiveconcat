@@ -36,10 +36,10 @@ type datum struct {
 
 // A command is an executable procedure.
 type command struct {
-	fn func(dictionary, stack) (dictionary, stack, error)
+	fn func(dictionary, *stack) (dictionary, error)
 }
 
-func (cmd command) execute(dict dictionary, s stack) (dictionary, stack, error) {
+func (cmd command) execute(dict dictionary, s *stack) (dictionary, error) {
 	return cmd.fn(dict, s)
 }
 

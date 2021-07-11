@@ -7,9 +7,9 @@ import (
 func TestEval(t *testing.T) {
 	for _, c := range evalTestCases {
 		dict := std()
-		s := stack{}
+		s := &stack{}
 		for i, line := range c.inputLines {
-			newDict, newS, err := interpretLine(line, dict, s)
+			newDict, err := interpretLine(line, dict, s)
 			if err != nil {
 				t.Fatalf(
 					"FAIL: %s\nError on input line %d: %v",
@@ -18,14 +18,14 @@ func TestEval(t *testing.T) {
 					err,
 				)
 			}
-			dict, s = newDict, newS
+			dict = newDict
 		}
 		if s.String() != c.wantStack.String() {
 			t.Fatalf(
 				"FAIL: %s\nWant: %s\nHave: %s\n",
 				c.description,
-				s,
 				c.wantStack,
+				s,
 			)
 
 		}
@@ -36,14 +36,16 @@ func TestEval(t *testing.T) {
 var evalTestCases = []struct {
 	description string
 	inputLines  []string
-	wantStack   stack
+	wantStack   *stack
 }{
 	{
 		description: "a number",
 		inputLines: []string{
 			"42",
 		},
-		wantStack: stack{}.push(mkNumber(42)),
+		wantStack: &stack{
+			data: []datum{mkNumber(42)},
+		},
 	},
 	{
 		description: "multiple numbers",
@@ -52,18 +54,18 @@ var evalTestCases = []struct {
 			"31.4",
 			"12.11111",
 		},
-		wantStack: stack{
+		wantStack: &stack{
 			data: []datum{
-				mkNumber(42),
-				mkNumber(31.4),
 				mkNumber(12.11111),
+				mkNumber(31.4),
+				mkNumber(42),
 			},
 		},
 	},
 	{
 		description: "arithmetic",
-		inputLines:  []string{"12", "42", "+", "4", "-", "10", "*", "2", "/"},
-		wantStack: stack{
+		inputLines:  []string{"12 42 + 4 - 10 * 2 /"},
+		wantStack: &stack{
 			data: []datum{
 				mkNumber(250),
 			},

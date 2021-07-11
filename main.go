@@ -11,8 +11,13 @@ import (
 )
 
 func main() {
-	inputReader := bufio.NewReader(os.Stdin)
-	log.Fatal(interactive(inputReader, std(), stack{}))
+	cfg := replConfig{
+		debugMode:    true,
+		input:        bufio.NewReader(os.Stdin),
+		initialDict:  std(),
+		initialStack: &stack{},
+	}
+	log.Fatal(repl(cfg))
 }
 
 // A dictionary binds words to data. When a word is evaluated, it is substituted
@@ -34,56 +39,35 @@ type stack struct {
 }
 
 // push puts datum d on top of the stack and returns it.
-func (s stack) push(d datum) stack {
-	return stack{append(s.data, d)}
+func (s *stack) push(d datum) {
+	s.data = append([]datum{d}, s.data...)
 }
 
 // pop removes the top item from the stack and returns them both.
-func (s stack) pop() (datum, stack, error) {
+func (s *stack) pop() (datum, error) {
 	if len(s.data) < 1 {
-		return datum{}, s, errors.New(emptyStackError)
+		return datum{}, errors.New(emptyStackError)
 	}
-	d, rest := s.data[0], s.data[1:]
-	s = stack{data: rest}
-	return d, s, nil
+	var d datum
+	d, s.data = s.data[0], s.data[1:]
+	return d, nil
 }
 
-func (s stack) String() (out string) {
+func (s *stack) String() (out string) {
 	for _, d := range s.data {
-		out = out + fmt.Sprintf("%v ", d.String())
+		out = fmt.Sprintf("%v ", d.String()) + out
 	}
 	return
 }
 
 const emptyStackError = "tried to access the top item of the stack, but the stack is empty"
 
-// repl (read-eval-print-loop) starts an interactive prompt.
-func interactive(in *bufio.Reader, dict dictionary, s stack) error {
-
-	for true {
-		// read a line from std in
-		fmt.Print("> ")
-		input, err := in.ReadString('\n')
-		if err != nil {
-			return fmt.Errorf("Error reading input: %e", err)
-		}
-
-		// interpret the line
-		dict, s, err = interpretLine(input, dict, s)
-		if err != nil {
-			return err
-		}
-		fmt.Println(s)
-	}
-	return nil
-}
-
-func interpretLine(line string, dict dictionary, s stack) (newDict dictionary, newStack stack, err error) {
+func interpretLine(line string, dict dictionary, s *stack) (newDict dictionary, err error) {
 	data, err := parse(tokenize(line))
 	if err != nil {
-		return dict, s, err
+		return dict, err
 	}
-	newDict, newStack, err = eval(data, dict, s)
+	newDict, err = eval(data, dict, s)
 	return
 }
 
@@ -148,30 +132,32 @@ func (t token) toWord() (d datum, err error) {
 
 }
 
-func eval(data []datum, dict dictionary, s stack) (dictionary, stack, error) {
+func eval(data []datum, dict dictionary, s *stack) (dictionary, error) {
 	for _, d := range data {
+
 		switch d.dataType {
 		case tnumber:
 			// push a number on the stack
-			s = s.push(d)
+			s.push(d)
 		case tword:
 			// look up a word in the dictionary
-			val, ok := dict.get(d.word)
+			definition, ok := dict.get(d.word)
 			if !ok {
-				return dict, s, undefinedError(d)
+				return dict, undefinedError(d)
 			}
-			return eval([]datum{val}, dict, s)
+			dict, err := eval([]datum{definition}, dict, s)
+			if err != nil {
+				return dict, err
+			}
 		case tcommand:
 			// execute a command
-			dict, newS, err := d.command.execute(dict, s)
+			dict, err := d.command.execute(dict, s)
 			if err != nil {
-				return dict, s, err
+				return dict, err
 			}
-			s = newS
-
 		}
 	}
-	return dict, s, nil
+	return dict, nil
 }
 
 func undefinedError(w datum) error {
@@ -187,109 +173,109 @@ func std() dictionary {
 			"say": {
 				dataType: tcommand,
 				command: command{
-					fn: func(dict dictionary, s stack) (dictionary, stack, error) {
-						d, s, err := s.pop()
+					fn: func(dict dictionary, s *stack) (dictionary, error) {
+						d, err := s.pop()
 						if err != nil {
-							return dict, s, err
+							return dict, err
 						}
 						fmt.Println(d)
-						return dict, s, nil
+						return dict, nil
 					},
 				},
 			},
 			"+": {
 				dataType: tcommand,
 				command: command{
-					fn: func(dict dictionary, s stack) (dictionary, stack, error) {
-						a, s, err := s.pop()
+					fn: func(dict dictionary, s *stack) (dictionary, error) {
+						a, err := s.pop()
 						if err != nil {
-							return dict, s, err
+							return dict, err
 						}
 						if a.dataType != tnumber {
-							return dict, s, typeError(a, tnumber)
+							return dict, typeError(a, tnumber)
 						}
-						b, s, err := s.pop()
+						b, err := s.pop()
 						if err != nil {
-							return dict, s, err
+							return dict, err
 						}
 						if b.dataType != tnumber {
-							return dict, s, typeError(b, tnumber)
+							return dict, typeError(b, tnumber)
 						}
-						s = s.push(datum{dataType: tnumber, number: a.number + b.number})
+						s.push(datum{dataType: tnumber, number: b.number + a.number})
 
-						return dict, s, nil
+						return dict, nil
 					},
 				},
 			},
 			"-": {
 				dataType: tcommand,
 				command: command{
-					fn: func(dict dictionary, s stack) (dictionary, stack, error) {
-						a, s, err := s.pop()
+					fn: func(dict dictionary, s *stack) (dictionary, error) {
+						a, err := s.pop()
 						if err != nil {
-							return dict, s, err
+							return dict, err
 						}
 						if a.dataType != tnumber {
-							return dict, s, typeError(a, tnumber)
+							return dict, typeError(a, tnumber)
 						}
-						b, s, err := s.pop()
+						b, err := s.pop()
 						if err != nil {
-							return dict, s, err
+							return dict, err
 						}
 						if b.dataType != tnumber {
-							return dict, s, typeError(b, tnumber)
+							return dict, typeError(b, tnumber)
 						}
-						s = s.push(datum{dataType: tnumber, number: a.number - b.number})
+						s.push(datum{dataType: tnumber, number: b.number - a.number})
 
-						return dict, s, nil
+						return dict, nil
 					},
 				},
 			},
 			"*": {
 				dataType: tcommand,
 				command: command{
-					fn: func(dict dictionary, s stack) (dictionary, stack, error) {
-						a, s, err := s.pop()
+					fn: func(dict dictionary, s *stack) (dictionary, error) {
+						a, err := s.pop()
 						if err != nil {
-							return dict, s, err
+							return dict, err
 						}
 						if a.dataType != tnumber {
-							return dict, s, typeError(a, tnumber)
+							return dict, typeError(a, tnumber)
 						}
-						b, s, err := s.pop()
+						b, err := s.pop()
 						if err != nil {
-							return dict, s, err
+							return dict, err
 						}
 						if b.dataType != tnumber {
-							return dict, s, typeError(b, tnumber)
+							return dict, typeError(b, tnumber)
 						}
-						s = s.push(datum{dataType: tnumber, number: a.number * b.number})
+						s.push(datum{dataType: tnumber, number: a.number * b.number})
 
-						return dict, s, nil
+						return dict, nil
 					},
 				},
 			},
 			"/": {
 				dataType: tcommand,
 				command: command{
-					fn: func(dict dictionary, s stack) (dictionary, stack, error) {
-						a, s, err := s.pop()
+					fn: func(dict dictionary, s *stack) (dictionary, error) {
+						a, err := s.pop()
 						if err != nil {
-							return dict, s, err
+							return dict, err
 						}
 						if a.dataType != tnumber {
-							return dict, s, typeError(a, tnumber)
+							return dict, typeError(a, tnumber)
 						}
-						b, s, err := s.pop()
+						b, err := s.pop()
 						if err != nil {
-							return dict, s, err
+							return dict, err
 						}
 						if b.dataType != tnumber {
-							return dict, s, typeError(b, tnumber)
+							return dict, typeError(b, tnumber)
 						}
-						s = s.push(datum{dataType: tnumber, number: a.number / b.number})
+						s.push(datum{dataType: tnumber, number: b.number / a.number})
 
-						return dict, s, nil
+						return dict, nil
 					},
 				},
 			},
