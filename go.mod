@@ -1,3 +1,3 @@
-module github.com/brendantang/stacklang
+module github.com/brendantang/naiveconcat
 
 go 1.16

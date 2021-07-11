@@ -26,7 +26,7 @@ func (dict dictionary) get(word string) (d datum, ok bool) {
 	return
 }
 
-// dataType describes the internal type that a stacklang datum has.
+// dataType describes the internal type that a  datum has.
 type dataType int
 
 const (
@@ -47,7 +47,7 @@ func (t dataType) String() (s string) {
 	return
 }
 
-// A datum is a stacklang value.
+// A datum represents a value.
 type datum struct {
 	dataType dataType
 	word     string
@@ -266,6 +266,78 @@ func std() dictionary {
 							return dict, s, typeError(b, tnumber)
 						}
 						s = s.push(datum{dataType: tnumber, number: a.number + b.number})
+
+						return dict, s, nil
+					},
+				},
+			},
+			"-": {
+				dataType: tcommand,
+				command: command{
+					fn: func(dict dictionary, s stack) (dictionary, stack, error) {
+						a, s, err := s.pop()
+						if err != nil {
+							return dict, s, err
+						}
+						if a.dataType != tnumber {
+							return dict, s, typeError(a, tnumber)
+						}
+						b, s, err := s.pop()
+						if err != nil {
+							return dict, s, err
+						}
+						if b.dataType != tnumber {
+							return dict, s, typeError(b, tnumber)
+						}
+						s = s.push(datum{dataType: tnumber, number: a.number - b.number})
+
+						return dict, s, nil
+					},
+				},
+			},
+			"*": {
+				dataType: tcommand,
+				command: command{
+					fn: func(dict dictionary, s stack) (dictionary, stack, error) {
+						a, s, err := s.pop()
+						if err != nil {
+							return dict, s, err
+						}
+						if a.dataType != tnumber {
+							return dict, s, typeError(a, tnumber)
+						}
+						b, s, err := s.pop()
+						if err != nil {
+							return dict, s, err
+						}
+						if b.dataType != tnumber {
+							return dict, s, typeError(b, tnumber)
+						}
+						s = s.push(datum{dataType: tnumber, number: a.number * b.number})
+
+						return dict, s, nil
+					},
+				},
+			},
+			"/": {
+				dataType: tcommand,
+				command: command{
+					fn: func(dict dictionary, s stack) (dictionary, stack, error) {
+						a, s, err := s.pop()
+						if err != nil {
+							return dict, s, err
+						}
+						if a.dataType != tnumber {
+							return dict, s, typeError(a, tnumber)
+						}
+						b, s, err := s.pop()
+						if err != nil {
+							return dict, s, err
+						}
+						if b.dataType != tnumber {
+							return dict, s, typeError(b, tnumber)
+						}
+						s = s.push(datum{dataType: tnumber, number: a.number / b.number})
 
 						return dict, s, nil
 					},
