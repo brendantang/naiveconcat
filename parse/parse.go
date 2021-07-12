@@ -35,10 +35,6 @@ func Tokenize(program string) (tokens []token) {
 
 type token string
 
-func toToken(s string) token {
-	return token(s)
-}
-
 func (t token) toDatum() (d data.Value, err error) {
 	d, err = t.toNumber()
 	if err == nil {
