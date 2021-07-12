@@ -2,16 +2,19 @@ package main
 
 import (
 	"bufio"
+	"github.com/brendantang/naiveconcat/builtins"
+	"github.com/brendantang/naiveconcat/data"
+	"github.com/brendantang/naiveconcat/evaluate"
 	"log"
 	"os"
 )
 
 func main() {
-	cfg := replConfig{
-		debugMode:    true,
-		input:        bufio.NewReader(os.Stdin),
-		initialDict:  std(),
-		initialStack: &stack{},
+	cfg := evaluate.Config{
+		DebugMode:    true,
+		Input:        bufio.NewReader(os.Stdin),
+		InitialDict:  builtins.Standard(),
+		InitialStack: data.NewStack(),
 	}
-	log.Fatal(repl(cfg))
+	log.Fatal(evaluate.REPL(cfg))
 }
