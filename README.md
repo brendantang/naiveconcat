@@ -1,4 +1,4 @@
-A simple concatenative programming language interpreter written in Go.
+A simple concatenative programming language written in Go.
 WIP.
 
 Status:
