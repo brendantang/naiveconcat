@@ -35,23 +35,25 @@ func Tokenize(program string) (tokens []token) {
 
 type token string
 
-func (t token) toDatum() (d data.Value, err error) {
-	d, err = t.toNumber()
+func (t token) toDatum() (data.Value, error) {
+	d, err := t.toNumber()
+
 	if err == nil {
-		return
+		return d, err
 	}
 	// otherwise it must be a word
 	d, err = t.toWord()
-	return
+	return d, err
 }
 
-func (t token) toNumber() (d data.Value, err error) {
+func (t token) toNumber() (data.Value, error) {
 	n, err := strconv.ParseFloat(string(t), 64)
 	if err != nil {
 		err = fmt.Errorf("could not convert '%s' into a number", t)
+		return data.NewNumber(0), err
 	}
-	d = data.NewNumber(n)
-	return
+	d := data.NewNumber(n)
+	return d, err
 }
 
 func (t token) toWord() (d data.Value, err error) {

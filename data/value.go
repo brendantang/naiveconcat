@@ -78,7 +78,7 @@ func NewNumber(n float64) Value {
 // NewWord constructs a word Value from a string.
 func NewWord(s string) Value {
 	return Value{
-		Type: Number,
+		Type: Word,
 		Word: s,
 	}
 }
