@@ -12,6 +12,7 @@ type Value struct {
 	Word      string
 	Number    float64
 	Proc      Procedure
+	String_   string
 	Quotation []Value
 }
 
@@ -20,6 +21,7 @@ type Type int
 
 const (
 	Number Type = iota
+	String
 	Word
 	Proc
 	Quotation
@@ -29,6 +31,8 @@ func (t Type) String() (s string) {
 	switch t {
 	case Number:
 		s = "number"
+	case String:
+		s = "string"
 	case Word:
 		s = "word"
 	case Proc:
@@ -72,6 +76,14 @@ func NewNumber(n float64) Value {
 	return Value{
 		Type:   Number,
 		Number: n,
+	}
+}
+
+// NewString constructs a number Value from a float.
+func NewString(s string) Value {
+	return Value{
+		Type:    String,
+		String_: s,
 	}
 }
 

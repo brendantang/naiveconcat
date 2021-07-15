@@ -18,3 +18,9 @@ func (dict Dictionary) Get(word string) (d Value, ok bool) {
 	d, ok = dict.bindings[word]
 	return
 }
+
+// Set saves the definition of a word.
+func (dict Dictionary) Set(word string, val Value) (d Dictionary) {
+	dict.bindings[word] = val
+	return NewDictionary(dict.bindings)
+}
