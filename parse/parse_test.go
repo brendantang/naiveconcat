@@ -34,6 +34,11 @@ var parseTestCases = []struct {
 		wantTokens:  []token{"1", "2", "3", "foo", "3"},
 	},
 	{
+		description: "string",
+		have:        `"foo" "2" "string with spaces"`,
+		wantTokens:  []token{"\"foo\"", "\"2\"", "\"string with spaces\""},
+	},
+	{
 		description: "quotation",
 		have:        "1 { 2 3 }",
 		wantTokens:  []token{"1", "{ 2 3 }"},
