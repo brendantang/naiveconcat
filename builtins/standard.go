@@ -8,11 +8,12 @@ import (
 func Standard() data.Dictionary {
 	return data.NewDictionary(
 		map[string]data.Value{
-			"say": data.NewProc(say),
-			"+":   data.NewProc(Add),
-			"-":   data.NewProc(subtract),
-			"*":   data.NewProc(multiply),
-			"/":   data.NewProc(divide),
+			"say":    data.NewProc(say),
+			"+":      data.NewProc(Add),
+			"-":      data.NewProc(subtract),
+			"*":      data.NewProc(multiply),
+			"/":      data.NewProc(divide),
+			"define": data.NewProc(define),
 		},
 	)
 }
