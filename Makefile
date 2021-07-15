@@ -1,3 +1,4 @@
 test:
-	go test ./evaluate
 	go test ./parse
+	go test ./eval
+	go test ./interpret

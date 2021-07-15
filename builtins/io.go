@@ -5,11 +5,11 @@ import (
 	"github.com/brendantang/naiveconcat/data"
 )
 
-func say(dict data.Dictionary, s *data.Stack) (data.Dictionary, error) {
-	d, err := s.Pop()
+func say(d *data.Dictionary, s *data.Stack) error {
+	val, err := s.Pop()
 	if err != nil {
-		return dict, err
+		return err
 	}
-	fmt.Println(d)
-	return dict, nil
+	fmt.Println(val)
+	return nil
 }

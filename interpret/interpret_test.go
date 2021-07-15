@@ -1,17 +1,16 @@
-package main
+package interpret
 
 import (
 	"github.com/brendantang/naiveconcat/builtins"
 	"github.com/brendantang/naiveconcat/data"
-	"github.com/brendantang/naiveconcat/eval"
 	"testing"
 )
 
-func TestEval(t *testing.T) {
-	for _, c := range evalTestCases {
-		dict := builtins.Standard()
+func TestInterpret(t *testing.T) {
+	for _, c := range testCases {
+		d := builtins.StandardDictionary()
 		s := data.NewStack()
-		newDict, err := eval.Interpret(c.input, dict, s)
+		err := Interpret(c.input, d, s)
 		if err != nil {
 			t.Fatalf(
 				"FAIL: %s\nInterpreter error: %v",
@@ -19,7 +18,6 @@ func TestEval(t *testing.T) {
 				err,
 			)
 		}
-		dict = newDict
 		if s.String() != c.wantStack.String() {
 			t.Fatalf(
 				"FAIL: %s\nWant: %s\nHave: %s\n",
@@ -33,7 +31,7 @@ func TestEval(t *testing.T) {
 
 }
 
-var evalTestCases = []struct {
+var testCases = []struct {
 	description string
 	input       string
 	wantStack   *data.Stack

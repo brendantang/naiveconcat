@@ -8,8 +8,9 @@ import (
 	"text/scanner"
 )
 
-// Parse turns a slice of tokens into a slice of data
-func Parse(tokens []token) ([]data.Value, error) {
+// Parse turns a string into a slice of data.Values
+func Parse(input string) ([]data.Value, error) {
+	tokens := tokenize(input)
 	data := make([]data.Value, len(tokens))
 	for i, t := range tokens {
 		d, err := t.toDatum()
@@ -21,8 +22,8 @@ func Parse(tokens []token) ([]data.Value, error) {
 	return data, nil
 }
 
-// Tokenize splits a string into tokens for the parser.
-func Tokenize(program string) (tokens []token) {
+// tokenize splits a string into tokens for the parser.
+func tokenize(program string) (tokens []token) {
 	var s scanner.Scanner
 	s.Init(strings.NewReader(program))
 	s.Filename = "default"

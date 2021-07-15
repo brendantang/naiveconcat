@@ -4,82 +4,82 @@ import (
 	"github.com/brendantang/naiveconcat/data"
 )
 
-func Add(dict data.Dictionary, s *data.Stack) (data.Dictionary, error) {
+func Add(d *data.Dictionary, s *data.Stack) error {
 	a, err := s.Pop()
 	if err != nil {
-		return dict, err
+		return err
 	}
 	if a.Type != data.Number {
-		return dict, data.TypeError(a, data.Number)
+		return data.TypeError(a, data.Number)
 	}
 	b, err := s.Pop()
 	if err != nil {
-		return dict, err
+		return err
 	}
 	if b.Type != data.Number {
-		return dict, data.TypeError(b, data.Number)
+		return data.TypeError(b, data.Number)
 	}
 	s.Push(data.NewNumber(b.Number + a.Number))
 
-	return dict, nil
+	return nil
 }
 
-func subtract(dict data.Dictionary, s *data.Stack) (data.Dictionary, error) {
+func subtract(d *data.Dictionary, s *data.Stack) error {
 	a, err := s.Pop()
 	if err != nil {
-		return dict, err
+		return err
 	}
 	if a.Type != data.Number {
-		return dict, data.TypeError(a, data.Number)
+		return data.TypeError(a, data.Number)
 	}
 	b, err := s.Pop()
 	if err != nil {
-		return dict, err
+		return err
 	}
 	if b.Type != data.Number {
-		return dict, data.TypeError(b, data.Number)
+		return data.TypeError(b, data.Number)
 	}
 	s.Push(data.NewNumber(b.Number - a.Number))
 
-	return dict, nil
+	return nil
 }
 
-func multiply(dict data.Dictionary, s *data.Stack) (data.Dictionary, error) {
+func multiply(d *data.Dictionary, s *data.Stack) error {
 	a, err := s.Pop()
 	if err != nil {
-		return dict, err
+		return err
 	}
 	if a.Type != data.Number {
-		return dict, data.TypeError(a, data.Number)
+		return data.TypeError(a, data.Number)
 	}
 	b, err := s.Pop()
 	if err != nil {
-		return dict, err
+		return err
 	}
 	if b.Type != data.Number {
-		return dict, data.TypeError(b, data.Number)
+		return data.TypeError(b, data.Number)
 	}
 	s.Push(data.NewNumber(a.Number * b.Number))
 
-	return dict, nil
+	return nil
 }
 
-func divide(dict data.Dictionary, s *data.Stack) (data.Dictionary, error) {
+func divide(d *data.Dictionary, s *data.Stack) error {
 	a, err := s.Pop()
 	if err != nil {
-		return dict, err
+		return err
 	}
 	if a.Type != data.Number {
-		return dict, data.TypeError(a, data.Number)
+		return data.TypeError(a, data.Number)
 	}
 	b, err := s.Pop()
 	if err != nil {
-		return dict, err
+		return err
 	}
 	if b.Type != data.Number {
-		return dict, data.TypeError(b, data.Number)
+		return data.TypeError(b, data.Number)
 	}
 	s.Push(data.NewNumber(b.Number / a.Number))
 
-	return dict, nil
+	return nil
 }

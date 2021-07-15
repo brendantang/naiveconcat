@@ -9,18 +9,17 @@ type Dictionary struct {
 }
 
 // NewDictionary takes a map of word bindings and returns a Dictionary.
-func NewDictionary(bindings map[string]Value) Dictionary {
-	return Dictionary{bindings}
+func NewDictionary(bindings map[string]Value) *Dictionary {
+	return &Dictionary{bindings}
 }
 
 // Get retrieves the Value of a word.
-func (dict Dictionary) Get(word string) (d Value, ok bool) {
+func (dict *Dictionary) Get(word string) (d Value, ok bool) {
 	d, ok = dict.bindings[word]
 	return
 }
 
 // Set saves the definition of a word.
-func (dict Dictionary) Set(word string, val Value) (d Dictionary) {
+func (dict *Dictionary) Set(word string, val Value) {
 	dict.bindings[word] = val
-	return NewDictionary(dict.bindings)
 }

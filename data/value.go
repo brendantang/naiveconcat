@@ -45,12 +45,12 @@ func (t Type) String() (s string) {
 
 // A Procedure is an executable procedure.
 type Procedure struct {
-	fn func(Dictionary, *Stack) (Dictionary, error)
+	fn func(*Dictionary, *Stack) error
 }
 
 // Execute runs a Procedure.
-func (proc Procedure) Execute(dict Dictionary, s *Stack) (Dictionary, error) {
-	return proc.fn(dict, s)
+func (proc Procedure) Execute(d *Dictionary, s *Stack) error {
+	return proc.fn(d, s)
 }
 
 func (v Value) String() (s string) {
@@ -104,7 +104,7 @@ func NewQuotation(data ...Value) Value {
 }
 
 // NewProc constructs a Proc Value from a function.
-func NewProc(fn func(Dictionary, *Stack) (Dictionary, error)) Value {
+func NewProc(fn func(*Dictionary, *Stack) error) Value {
 	return Value{
 		Type: Proc,
 		Proc: Procedure{fn},
