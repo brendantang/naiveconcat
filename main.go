@@ -4,17 +4,17 @@ import (
 	"bufio"
 	"github.com/brendantang/naiveconcat/builtins"
 	"github.com/brendantang/naiveconcat/data"
-	"github.com/brendantang/naiveconcat/evaluate"
+	"github.com/brendantang/naiveconcat/eval"
 	"log"
 	"os"
 )
 
 func main() {
-	cfg := evaluate.Config{
+	cfg := eval.Config{
 		DebugMode:    true,
 		Input:        bufio.NewReader(os.Stdin),
 		InitialDict:  builtins.Standard(),
 		InitialStack: data.NewStack(),
 	}
-	log.Fatal(evaluate.REPL(cfg))
+	log.Fatal(eval.REPL(cfg))
 }
