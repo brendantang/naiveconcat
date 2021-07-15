@@ -1,0 +1,95 @@
+package main
+
+import (
+	"github.com/brendantang/naiveconcat/builtins"
+	"github.com/brendantang/naiveconcat/data"
+	"github.com/brendantang/naiveconcat/eval"
+	"testing"
+)
+
+func TestEval(t *testing.T) {
+	for _, c := range evalTestCases {
+		dict := builtins.Standard()
+		s := data.NewStack()
+		newDict, err := eval.Interpret(c.input, dict, s)
+		if err != nil {
+			t.Fatalf(
+				"FAIL: %s\nInterpreter error: %v",
+				c.description,
+				err,
+			)
+		}
+		dict = newDict
+		if s.String() != c.wantStack.String() {
+			t.Fatalf(
+				"FAIL: %s\nWant: %s\nHave: %s\n",
+				c.description,
+				c.wantStack,
+				s,
+			)
+		}
+
+	}
+
+}
+
+var evalTestCases = []struct {
+	description string
+	input       string
+	wantStack   *data.Stack
+}{
+	{
+		description: "a number",
+		input:       "42",
+		wantStack:   data.NewStack(data.NewNumber(42)),
+	},
+	{
+		description: "multiple numbers",
+		input:       "42\r31.4\r12.11111",
+		wantStack: data.NewStack(
+			data.NewNumber(12.11111),
+			data.NewNumber(31.4),
+			data.NewNumber(42),
+		),
+	},
+	{
+		description: "arithmetic",
+		input:       "12 42 + 4 - 10 * 2 /",
+		wantStack: data.NewStack(
+			data.NewNumber(250),
+		),
+	},
+	{
+		description: "strings",
+		input:       `"I'm a string" "I am another string!"`,
+		wantStack: data.NewStack(
+			data.NewString("I am another string!"),
+			data.NewString("I'm a string"),
+		),
+	},
+	{
+		description: "define a word that evaluates to a number",
+		input:       `55 "gf-age" define \r gf-age`,
+		wantStack: data.NewStack(
+			data.NewNumber(55),
+		),
+	},
+	{
+		description: "define a only saves the top item of the stack",
+		input:       `32 81 55 "gf-age" define \r gf-age`,
+		wantStack: data.NewStack(
+			data.NewNumber(55),
+		),
+	},
+	{
+		description: "quotation",
+		input:       "{1 2 +}",
+		wantStack: data.NewStack(
+			data.NewQuotation(
+				data.NewNumber(1),
+				data.NewNumber(2),
+				data.NewProc(builtins.Add),
+			),
+		),
+	},
+}
