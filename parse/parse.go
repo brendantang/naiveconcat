@@ -4,16 +4,14 @@ import (
 	"fmt"
 	"github.com/brendantang/naiveconcat/data"
 	"strconv"
-	"strings"
-	"text/scanner"
 )
 
-// Parse turns a string into a slice of data.Values
+// Parse turns a string into a slice of data.Value
 func Parse(input string) ([]data.Value, error) {
 	tokens := tokenize(input)
 	data := make([]data.Value, len(tokens))
 	for i, t := range tokens {
-		d, err := t.toDatum()
+		d, err := t.toValue()
 		if err != nil {
 			return nil, err
 		}
@@ -23,44 +21,33 @@ func Parse(input string) ([]data.Value, error) {
 }
 
 // tokenize splits a string into tokens for the parser.
-func tokenize(program string) (tokens []token) {
-	var s scanner.Scanner
-	s.Init(strings.NewReader(program))
-	s.Filename = "default"
-	for tok := s.Scan(); tok != scanner.EOF; tok = s.Scan() {
-		tokens = append(tokens, token(s.TokenText()))
+func tokenize(program string) []token {
+
+	l := &lexer{source: program, behavior: defaultBehavior}
+	l.run()
+	return l.tokens
+}
+
+// A token represents a string for the parser to try and parse into a value.
+type token struct {
+	typ  data.Type // indicates the type of value to attempt to parse the token into.
+	body string    // the string to parse into a value.
+}
+
+func (t token) String() string {
+	return fmt.Sprintf("%s: %s", t.typ, t.body)
+}
+
+func (t token) toValue() (val data.Value, err error) {
+	switch t.typ {
+	case data.Number:
+		var n float64
+		n, err = strconv.ParseFloat(t.body, 64)
+		val = data.NewNumber(n)
+	case data.String:
+		val = data.NewString(t.body)
+	default:
+		err = fmt.Errorf("no parsing behavior defined for token type '%s'", t.typ)
 	}
 	return
-
-}
-
-type token string
-
-func (t token) toDatum() (data.Value, error) {
-	d, err := t.toNumber()
-
-	if err == nil {
-		return d, err
-	}
-	// otherwise it must be a word
-	d, err = t.toWord()
-	return d, err
-}
-
-func (t token) toNumber() (data.Value, error) {
-	n, err := strconv.ParseFloat(string(t), 64)
-	if err != nil {
-		err = fmt.Errorf("could not convert '%s' into a number", t)
-		return data.NewNumber(0), err
-	}
-	d := data.NewNumber(n)
-	return d, err
-}
-
-func (t token) toWord() (d data.Value, err error) {
-	return data.NewWord(string(t)), nil
-}
-
-func (t token) toQuotation() (d data.Value, err error) {
-	panic("implement token.toQuotation()")
 }
