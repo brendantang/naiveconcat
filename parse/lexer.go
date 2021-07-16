@@ -1,7 +1,6 @@
 package parse
 
 import (
-	"github.com/brendantang/naiveconcat/data"
 	"strings"
 	"unicode/utf8"
 )
@@ -10,6 +9,9 @@ const (
 	wordRunes            = "abcdefghijjklmnopqrstuvwxyz-" // wordRunes are legal characters in a word name.
 	stringDelimiter rune = '"'                            // delimiter that opens or closes a string.
 	stringEscaper   rune = '\\'                           // delimiter that escapes the following character in a string.
+	quotationOpener rune = '{'                            // delimiter that opens a quotation.
+	quotationCloser rune = '}'                            // delimiter that closes a quotation.
+	eof             rune = -1
 )
 
 type lexer struct {
@@ -41,6 +43,12 @@ func defaultBehavior(l *lexer) lexingFn {
 		case r == stringDelimiter:
 			l.ignore(width) // ignore the opening "
 			return lexString
+		case r == quotationOpener:
+			l.selectionEnd += width
+			l.commit(tOpenQ)
+		case r == quotationCloser:
+			l.selectionEnd += width
+			l.commit(tCloseQ)
 		default:
 			return nil
 		}
@@ -53,13 +61,13 @@ func lexNumber(l *lexer) lexingFn {
 	l.accept("0123456789")
 	l.acceptOne(".")
 	l.accept("0123456789")
-	l.commit(data.Number)
+	l.commit(tNum)
 	return defaultBehavior
 }
 
 func lexWord(l *lexer) lexingFn {
 	l.accept(wordRunes)
-	l.commit(data.Word)
+	l.commit(tWord)
 	return defaultBehavior
 }
 
@@ -80,7 +88,7 @@ func lexString(l *lexer) lexingFn {
 			l.selectionEnd += width
 		}
 	}
-	l.commit(data.String)
+	l.commit(tStr)
 	l.ignore(width)
 	return defaultBehavior
 }
@@ -107,7 +115,7 @@ func (l *lexer) next() (r rune) {
 
 // commit uses the selection and given type to add a new token to tokens. The
 // beginning of the next selection starts at the end of the previous.
-func (l *lexer) commit(t data.Type) {
+func (l *lexer) commit(t tokenType) {
 	tok := token{t, l.selection()}
 	l.tokens = append(l.tokens, tok)
 	l.selectionStart = l.selectionEnd
@@ -136,8 +144,6 @@ func (l *lexer) ignore(width int) {
 	l.selectionEnd += width
 	l.selectionStart = l.selectionEnd
 }
-
-const eof rune = -1
 
 func isWhitespace(r rune) bool {
 	return matchRune(" \n\r\t", r)

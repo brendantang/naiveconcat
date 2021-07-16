@@ -30,8 +30,34 @@ func tokenize(program string) []token {
 
 // A token represents a string for the parser to try and parse into a value.
 type token struct {
-	typ  data.Type // indicates the type of value to attempt to parse the token into.
+	typ  tokenType // indicates the type of value to attempt to parse the token into.
 	body string    // the string to parse into a value.
+}
+
+type tokenType int
+
+const (
+	tNum tokenType = iota
+	tWord
+	tStr
+	tOpenQ
+	tCloseQ
+)
+
+func (t tokenType) String() (s string) {
+	switch t {
+	case tNum:
+		s = "number"
+	case tStr:
+		s = "string"
+	case tWord:
+		s = "word"
+	case tOpenQ:
+		s = "open quotation"
+	case tCloseQ:
+		s = "close quotation"
+	}
+	return
 }
 
 func (t token) String() string {
@@ -40,11 +66,11 @@ func (t token) String() string {
 
 func (t token) toValue() (val data.Value, err error) {
 	switch t.typ {
-	case data.Number:
+	case tNum:
 		var n float64
 		n, err = strconv.ParseFloat(t.body, 64)
 		val = data.NewNumber(n)
-	case data.String:
+	case tStr:
 		val = data.NewString(t.body)
 	default:
 		err = fmt.Errorf("no parsing behavior defined for token type '%s'", t.typ)
