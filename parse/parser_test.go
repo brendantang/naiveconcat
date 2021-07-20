@@ -9,20 +9,26 @@ func TestParser(t *testing.T) {
 	for _, c := range testCases {
 		var in = make(chan token, 1)
 		p := NewParser(in)
-		go p.Run()
 
-		for _, tok := range c.wantTokens {
-			in <- tok
-		}
-		close(in)
+		go func() {
+			for _, tok := range c.wantTokens {
+				in <- tok
+			}
+			close(in)
+		}()
+		go p.Run()
 
 		var got []data.Value
 
 		for more := true; more; {
 			select {
 			case val, ok := <-p.Out:
+				if !ok {
+					more = ok
+					break
+				}
+
 				got = append(got, val)
-				more = ok
 			case err := <-p.Errs:
 				if err != nil {
 					t.Fatalf("FAIL: %s\nParsing error: %v", c.description, err)

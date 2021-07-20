@@ -26,9 +26,9 @@ func (p *Parser) Run() {
 		switch tok.typ {
 		case num:
 			if n, err := strconv.ParseFloat(tok.body, 64); err != nil {
-				p.Out <- data.NewNumber(n)
-			} else {
 				p.Errs <- conversionError(tok, data.Number)
+			} else {
+				p.Out <- data.NewNumber(n)
 			}
 		}
 	}
