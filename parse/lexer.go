@@ -1,6 +1,7 @@
 package parse
 
 import (
+	"fmt"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -12,7 +13,6 @@ const (
 	stringEscaper   rune = '\\'                              // delimiter that escapes the following character in a string.
 	quotationOpener rune = '{'                               // delimiter that opens a quotation.
 	quotationCloser rune = '}'                               // delimiter that closes a quotation.
-	eof             rune = -1
 )
 
 // Lexer scans an input src and emits a stream of lexed tokens.
@@ -29,7 +29,7 @@ type Lexer struct {
 func NewLexer(src string) *Lexer {
 	return &Lexer{
 		src:      src,
-		Out:      make(chan token, 2),
+		Out:      make(chan token, 1),
 		Errs:     make(chan error, 1),
 		behavior: lexMain,
 	}
@@ -48,7 +48,7 @@ func (l *Lexer) Run() {
 }
 
 func lexMain(l *Lexer) lexingFn {
-	for r, width := l.peek(); r != eof; r, width = l.peek() {
+	for r, width := l.peek(); r != EOF; r, width = l.peek() {
 		switch {
 		case r == '-' || r == '.': // either could be a word or the beginning of a number.
 			if nextR, _ := l.peek(); !unicode.IsDigit(nextR) {
@@ -124,7 +124,7 @@ func lexString(l *Lexer) lexingFn {
 // peek returns the next rune without adding it to the selection.
 func (l *Lexer) peek() (r rune, width int) {
 	if l.endPos >= len(l.src) {
-		return eof, 0
+		return EOF, 0
 	}
 	return utf8.DecodeRuneInString(l.src[l.endPos:])
 }
@@ -133,7 +133,7 @@ func (l *Lexer) peek() (r rune, width int) {
 func (l *Lexer) next() (r rune) {
 	// return EOF if reached end of source
 	if l.endPos >= len(l.src) {
-		return eof
+		return EOF
 	}
 
 	r, width := utf8.DecodeRuneInString(l.src[l.endPos:])
@@ -154,6 +154,10 @@ func (l *Lexer) commit(typ tokenType) {
 // selection returns the slice of the input string between the startPos
 // and endPos.
 func (l *Lexer) selection() string {
+	if l.startPos >= l.endPos {
+		l.Errs <- fmt.Errorf("tried to take a selection that starts at %d but ends at %d", l.startPos, l.endPos)
+		return ""
+	}
 	return l.src[l.startPos:l.endPos]
 }
 

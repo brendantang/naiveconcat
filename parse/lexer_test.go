@@ -14,9 +14,12 @@ func TestLexer(t *testing.T) {
 		var err error
 
 		for more := true; more; {
+			t.Logf("%#v", l)
 			select {
 			case tok, ok := <-l.Out:
 				t.Log("received from out", tok)
+				if false {
+				}
 				got = append(got, tok)
 				more = ok
 

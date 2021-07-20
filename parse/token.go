@@ -4,6 +4,9 @@ import (
 	"fmt"
 )
 
+// EOF is the rune that indicates the end of input
+const EOF rune = -1
+
 // A token represents a string for the parser to try and parse into a value.
 type token struct {
 	typ  tokenType // indicates the type of value to attempt to parse the token into.
@@ -13,7 +16,8 @@ type token struct {
 type tokenType int
 
 const (
-	num tokenType = iota
+	eof tokenType = iota
+	num
 	word
 	str
 	openQ
@@ -22,6 +26,8 @@ const (
 
 func (t tokenType) String() (s string) {
 	switch t {
+	case eof:
+		s = "end of file"
 	case num:
 		s = "number"
 	case str:
