@@ -15,12 +15,25 @@ const (
 	eof             rune = -1
 )
 
+// the lexer scans an input src and emits a stream of lexed tokens.
 type lexer struct {
-	source         string
-	selectionStart int
-	selectionEnd   int
-	tokens         []token
-	behavior       lexingFn
+	src      string     // source text to lex.
+	out      chan token // where lexed tokens are sent.
+	errs     chan error // where lexing errors are sent.
+	done     chan bool  // send true when done lexing src.
+	behavior lexingFn   // function defining lexing behavior.
+	startPos int        // selection start position.
+	endPos   int        // selection end position.
+}
+
+func newLexer(src string, start lexingFn) *lexer {
+	return &lexer{
+		src:      src,
+		out:      make(chan token, 2),
+		errs:     make(chan error, 1),
+		done:     make(chan bool, 1),
+		behavior: start,
+	}
 }
 
 type lexingFn func(l *lexer) lexingFn
@@ -31,8 +44,7 @@ func (l *lexer) run() {
 	}
 }
 
-// default behavior determines a more specific lexingFn to define behavior.
-func defaultBehavior(l *lexer) lexingFn {
+func lexMain(l *lexer) lexingFn {
 	for r, width := l.peek(); r != eof; r, width = l.peek() {
 		switch {
 		case r == '-' || r == '.': // either could be a word or the beginning of a number.
@@ -55,11 +67,11 @@ func defaultBehavior(l *lexer) lexingFn {
 			return lexString
 
 		case r == quotationOpener:
-			l.selectionEnd += width
+			l.endPos += width
 			l.commit(openQ)
 
 		case r == quotationCloser:
-			l.selectionEnd += width
+			l.endPos += width
 			l.commit(closeQ)
 
 		default:
@@ -75,13 +87,13 @@ func lexNumber(l *lexer) lexingFn {
 	l.acceptOne(".")
 	l.accept("0123456789")
 	l.commit(num)
-	return defaultBehavior
+	return lexMain
 }
 
 func lexWord(l *lexer) lexingFn {
 	l.accept(wordRunes)
 	l.commit(word)
-	return defaultBehavior
+	return lexMain
 }
 
 func lexString(l *lexer) lexingFn {
@@ -98,46 +110,46 @@ func lexString(l *lexer) lexingFn {
 		previous = current
 		current, width = l.peek()
 		if !shouldTerminate() {
-			l.selectionEnd += width
+			l.endPos += width
 		}
 	}
 	l.commit(str)
 	l.ignore(width)
-	return defaultBehavior
+	return lexMain
 }
 
 // peek returns the next rune without adding it to the selection.
 func (l *lexer) peek() (r rune, width int) {
-	if l.selectionEnd >= len(l.source) {
+	if l.endPos >= len(l.src) {
 		return eof, 0
 	}
-	return utf8.DecodeRuneInString(l.source[l.selectionEnd:])
+	return utf8.DecodeRuneInString(l.src[l.endPos:])
 }
 
 // next returns the next rune and includes it in the selection.
 func (l *lexer) next() (r rune) {
 	// return EOF if reached end of source
-	if l.selectionEnd >= len(l.source) {
+	if l.endPos >= len(l.src) {
 		return eof
 	}
 
-	r, width := utf8.DecodeRuneInString(l.source[l.selectionEnd:])
-	l.selectionEnd += width
+	r, width := utf8.DecodeRuneInString(l.src[l.endPos:])
+	l.endPos += width
 	return r
 }
 
-// commit uses the selection and given type to add a new token to tokens. The
-// beginning of the next selection starts at the end of the previous.
-func (l *lexer) commit(t tokenType) {
-	tok := token{t, l.selection()}
-	l.tokens = append(l.tokens, tok)
-	l.selectionStart = l.selectionEnd
+// commit uses the selection and given type to initialize a token and sends it
+// to the out channel. The beginning of the next selection starts at the end of
+// the previous.
+func (l *lexer) commit(typ tokenType) {
+	l.out <- token{typ, l.selection()}
+	l.startPos = l.endPos
 }
 
-// selection returns the slice of the input string between the selectionStart
-// and selectionEnd.
+// selection returns the slice of the input string between the startPos
+// and endPos.
 func (l *lexer) selection() string {
-	return l.source[l.selectionStart:l.selectionEnd]
+	return l.src[l.startPos:l.endPos]
 }
 
 func (l *lexer) accept(valid string) {
@@ -149,13 +161,13 @@ func (l *lexer) acceptOne(valid string) bool {
 	if !(strings.IndexRune(valid, r) >= 0) {
 		return false
 	}
-	l.selectionEnd += width
+	l.endPos += width
 	return true
 }
 
 func (l *lexer) ignore(width int) {
-	l.selectionEnd += width
-	l.selectionStart = l.selectionEnd
+	l.endPos += width
+	l.startPos = l.endPos
 }
 
 func isWhitespace(r rune) bool {

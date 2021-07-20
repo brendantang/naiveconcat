@@ -6,26 +6,39 @@ import (
 	"strconv"
 )
 
-// Parse turns a string into a slice of data.Value
-func Parse(input string) ([]data.Value, error) {
-	tokens := tokenize(input)
-	data := make([]data.Value, len(tokens))
-	for i, t := range tokens {
-		d, err := t.toValue()
-		if err != nil {
-			return nil, err
-		}
-		data[i] = d
-	}
-	return data, nil
+type parser struct {
+	in   chan token      // where lexed tokens are received.
+	out  chan data.Value // where parsed expressions are sent.
+	done chan bool       // send true when input channel closed.
+	errs chan error      // where parsing errors are sent.
 }
 
-// tokenize splits a string into tokens for the parser.
-func tokenize(program string) []token {
+func newParser(input chan token) *parser {
+	return &parser{
+		in:   input,
+		out:  make(chan data.Value, 2),
+		done: make(chan bool, 1),
+		errs: make(chan error, 1),
+	}
 
-	l := &lexer{source: program, behavior: defaultBehavior}
-	l.run()
-	return l.tokens
+}
+
+func (p *parser) run() {
+	for tok := range p.in {
+		switch tok.typ {
+		case num:
+			if n, err := strconv.ParseFloat(tok.body, 64); err != nil {
+				p.out <- data.NewNumber(n)
+			} else {
+				p.errs <- conversionError(tok, data.Number)
+			}
+		}
+	}
+	p.done <- true
+}
+
+func conversionError(tok token, typ data.Type) error {
+	return fmt.Errorf("could not parse %v as %v", tok, typ)
 }
 
 // A token represents a string for the parser to try and parse into a value.
