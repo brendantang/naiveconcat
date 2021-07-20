@@ -27,8 +27,8 @@ func TestParser(t *testing.T) {
 					more = ok
 					break
 				}
-
 				got = append(got, val)
+
 			case err := <-p.Errs:
 				if err != nil {
 					t.Fatalf("FAIL: %s\nParsing error: %v", c.description, err)

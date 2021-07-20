@@ -12,7 +12,7 @@ type Value struct {
 	Word      string
 	Number    float64
 	Proc      Procedure
-	String_   string
+	Str       string
 	Quotation []Value
 }
 
@@ -67,6 +67,8 @@ func (v Value) String() (s string) {
 			itemStrings[i] = item.String()
 		}
 		s = fmt.Sprintf("{%s}", strings.Join(itemStrings, " "))
+	case String:
+		s = fmt.Sprintf("\"%s\"", v.Str)
 	}
 	return
 }
@@ -82,8 +84,8 @@ func NewNumber(n float64) Value {
 // NewString constructs a number Value from a float.
 func NewString(s string) Value {
 	return Value{
-		Type:    String,
-		String_: s,
+		Type: String,
+		Str:  s,
 	}
 }
 

@@ -30,6 +30,10 @@ func (p *Parser) Run() {
 			} else {
 				p.Out <- data.NewNumber(n)
 			}
+		case word:
+			p.Out <- data.NewWord(tok.body)
+		case str:
+			p.Out <- data.NewString(tok.body)
 		}
 	}
 	close(p.Out)
