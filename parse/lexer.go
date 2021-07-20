@@ -15,36 +15,39 @@ const (
 	eof             rune = -1
 )
 
-// the lexer scans an input src and emits a stream of lexed tokens.
-type lexer struct {
+// Lexer scans an input src and emits a stream of lexed tokens.
+type Lexer struct {
 	src      string     // source text to lex.
-	out      chan token // where lexed tokens are sent.
-	errs     chan error // where lexing errors are sent.
-	done     chan bool  // send true when done lexing src.
+	Out      chan token // where lexed tokens are sent.
+	Errs     chan error // where lexing errors are sent.
 	behavior lexingFn   // function defining lexing behavior.
 	startPos int        // selection start position.
 	endPos   int        // selection end position.
 }
 
-func newLexer(src string, start lexingFn) *lexer {
-	return &lexer{
+// NewLexer returns a *Lexer with initialized Out, Errs, and Done channels.
+func NewLexer(src string) *Lexer {
+	return &Lexer{
 		src:      src,
-		out:      make(chan token, 2),
-		errs:     make(chan error, 1),
-		done:     make(chan bool, 1),
-		behavior: start,
+		Out:      make(chan token, 2),
+		Errs:     make(chan error, 1),
+		behavior: lexMain,
 	}
 }
 
-type lexingFn func(l *lexer) lexingFn
+type lexingFn func(l *Lexer) lexingFn
 
-func (l *lexer) run() {
+// Run scans the source text and emits tokens on the Out channel. When an error
+// is encountered, it is sent on the Errs channel. When lexing is finished,
+// true is sent on the Done channel.
+func (l *Lexer) Run() {
 	for l.behavior != nil {
 		l.behavior = l.behavior(l)
 	}
+	close(l.Out)
 }
 
-func lexMain(l *lexer) lexingFn {
+func lexMain(l *Lexer) lexingFn {
 	for r, width := l.peek(); r != eof; r, width = l.peek() {
 		switch {
 		case r == '-' || r == '.': // either could be a word or the beginning of a number.
@@ -81,7 +84,7 @@ func lexMain(l *lexer) lexingFn {
 	return nil
 }
 
-func lexNumber(l *lexer) lexingFn {
+func lexNumber(l *Lexer) lexingFn {
 	l.acceptOne("-.")
 	l.accept("0123456789")
 	l.acceptOne(".")
@@ -90,13 +93,13 @@ func lexNumber(l *lexer) lexingFn {
 	return lexMain
 }
 
-func lexWord(l *lexer) lexingFn {
+func lexWord(l *Lexer) lexingFn {
 	l.accept(wordRunes)
 	l.commit(word)
 	return lexMain
 }
 
-func lexString(l *lexer) lexingFn {
+func lexString(l *Lexer) lexingFn {
 	var (
 		current  rune
 		previous rune
@@ -119,7 +122,7 @@ func lexString(l *lexer) lexingFn {
 }
 
 // peek returns the next rune without adding it to the selection.
-func (l *lexer) peek() (r rune, width int) {
+func (l *Lexer) peek() (r rune, width int) {
 	if l.endPos >= len(l.src) {
 		return eof, 0
 	}
@@ -127,7 +130,7 @@ func (l *lexer) peek() (r rune, width int) {
 }
 
 // next returns the next rune and includes it in the selection.
-func (l *lexer) next() (r rune) {
+func (l *Lexer) next() (r rune) {
 	// return EOF if reached end of source
 	if l.endPos >= len(l.src) {
 		return eof
@@ -141,22 +144,24 @@ func (l *lexer) next() (r rune) {
 // commit uses the selection and given type to initialize a token and sends it
 // to the out channel. The beginning of the next selection starts at the end of
 // the previous.
-func (l *lexer) commit(typ tokenType) {
-	l.out <- token{typ, l.selection()}
+func (l *Lexer) commit(typ tokenType) {
+	tok := token{typ, l.selection()}
+	l.Out <- tok
+
 	l.startPos = l.endPos
 }
 
 // selection returns the slice of the input string between the startPos
 // and endPos.
-func (l *lexer) selection() string {
+func (l *Lexer) selection() string {
 	return l.src[l.startPos:l.endPos]
 }
 
-func (l *lexer) accept(valid string) {
+func (l *Lexer) accept(valid string) {
 	for l.acceptOne(valid) {
 	}
 }
-func (l *lexer) acceptOne(valid string) bool {
+func (l *Lexer) acceptOne(valid string) bool {
 	r, width := l.peek()
 	if !(strings.IndexRune(valid, r) >= 0) {
 		return false
@@ -165,7 +170,7 @@ func (l *lexer) acceptOne(valid string) bool {
 	return true
 }
 
-func (l *lexer) ignore(width int) {
+func (l *Lexer) ignore(width int) {
 	l.endPos += width
 	l.startPos = l.endPos
 }

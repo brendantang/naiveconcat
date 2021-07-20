@@ -16,13 +16,23 @@ import (
 // Interpret takes input, parses it into expressions, and then evaluates those
 // expressions to mutate the dictionary and stack.
 func Interpret(input string, d *data.Dictionary, s *data.Stack) error {
-	vals, err := parse.Parse(input)
-	if err != nil {
-		return err
-	}
-	err = eval.Eval(vals, d, s)
-	if err != nil {
-		return err
+	l := parse.NewLexer(input)
+	p := parse.NewParser(l.Out)
+	go l.Run()
+	go p.Run()
+	for more := true; more; {
+		select {
+		case val, ok := <-p.Out:
+			evalErr := eval.Eval(val, d, s)
+			if evalErr != nil {
+				return evalErr
+			}
+			more = ok
+		case parseErr := <-p.Errs:
+			if parseErr != nil {
+				return parseErr
+			}
+		}
 	}
 	return nil
 }

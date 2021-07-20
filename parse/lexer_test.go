@@ -7,18 +7,20 @@ import (
 func TestLexer(t *testing.T) {
 	for _, c := range testCases {
 
-		l := newLexer(c.src, lexMain)
-		go l.run()
+		l := NewLexer(c.src)
+		l.Run()
 
 		var got []token
 		var err error
 
-		for done := false; done; {
+		for more := true; more; {
 			select {
-			case tok := <-l.out:
+			case tok, ok := <-l.Out:
+				t.Log("received from out", tok)
 				got = append(got, tok)
+				more = ok
 
-			case err = <-l.errs:
+			case err = <-l.Errs:
 				if err != nil {
 					t.Fatalf(
 						"FAIL: %s\nLexing error: %v",
@@ -26,8 +28,6 @@ func TestLexer(t *testing.T) {
 						err,
 					)
 				}
-			case done = <-l.done:
-				break
 			}
 		}
 

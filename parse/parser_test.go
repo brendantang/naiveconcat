@@ -8,8 +8,8 @@ import (
 func TestParser(t *testing.T) {
 	for _, c := range testCases {
 		var in = make(chan token, 1)
-		p := newParser(in)
-		go p.run()
+		p := NewParser(in)
+		go p.Run()
 
 		for _, tok := range c.wantTokens {
 			in <- tok
@@ -18,16 +18,15 @@ func TestParser(t *testing.T) {
 
 		var got []data.Value
 
-		for done := false; done; {
+		for more := true; more; {
 			select {
-			case val := <-p.out:
+			case val, ok := <-p.Out:
 				got = append(got, val)
-			case err := <-p.errs:
+				more = ok
+			case err := <-p.Errs:
 				if err != nil {
 					t.Fatalf("FAIL: %s\nParsing error: %v", c.description, err)
 				}
-			case done = <-p.done:
-				break
 			}
 		}
 
