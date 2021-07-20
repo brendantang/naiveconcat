@@ -35,7 +35,7 @@ func (s *Stack) Pop() (Value, error) {
 func (s *Stack) String() string {
 	var strs []string
 	for _, val := range s.data {
-		strs = append(strs, val.String())
+		strs = append([]string{val.String()}, strs...)
 	}
 	return fmt.Sprintf("[%s]", strings.Join(strs, " "))
 }

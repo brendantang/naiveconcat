@@ -43,6 +43,6 @@ var testCases = []testCase{
 			data.NewNumber(2.4),
 			data.NewNumber(-1000000),
 		},
-		"[-1000000 2.4 24]",
+		"[24 2.4 -1000000]",
 	},
 }
