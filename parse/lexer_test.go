@@ -25,7 +25,7 @@ func TestLexer(t *testing.T) {
 			case err = <-l.Errs:
 				if err != nil {
 					t.Fatalf(
-						"FAIL: %s\nLexing error: %v",
+						"FAIL: %s\n%v",
 						c.description,
 						err,
 					)

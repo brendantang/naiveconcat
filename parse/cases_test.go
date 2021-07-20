@@ -64,6 +64,36 @@ var testCases = []testCase{
 		},
 	},
 	{
+		"operators",
+		"- + / *",
+		[]token{
+			{word, "-"},
+			{word, "+"},
+			{word, "/"},
+			{word, "*"},
+		},
+		[]data.Value{
+			data.NewWord("-"),
+			data.NewWord("+"),
+			data.NewWord("/"),
+			data.NewWord("*"),
+		},
+	},
+	{
+		"whitespace",
+		"foo \n bar \r \t baz",
+		[]token{
+			{word, "foo"},
+			{word, "bar"},
+			{word, "baz"},
+		},
+		[]data.Value{
+			data.NewWord("foo"),
+			data.NewWord("bar"),
+			data.NewWord("baz"),
+		},
+	},
+	{
 		"quotation",
 		"1 { 2 3 }",
 		[]token{

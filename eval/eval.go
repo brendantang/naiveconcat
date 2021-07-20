@@ -5,12 +5,13 @@ import (
 	"github.com/brendantang/naiveconcat/data"
 )
 
-// Eval takes a slice of expressions
+// Eval evaluates a value in the context of a Dictionary and Stack, possibly mutating
+// both.
 func Eval(val data.Value, d *data.Dictionary, s *data.Stack) error {
 
 	switch val.Type {
-	case data.Number:
-		// push a number on the stack
+	case data.Number, data.String:
+		// push a literal value on the stack
 		s.Push(val)
 	case data.Word:
 		// look up a word in the dictionary

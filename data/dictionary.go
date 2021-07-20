@@ -1,6 +1,8 @@
 package data
 
-import ()
+import (
+	"fmt"
+)
 
 // A Dictionary binds words to data. When a word is evaluated, it is substituted
 // for the data it binds in the Dictionary.
@@ -22,4 +24,11 @@ func (dict *Dictionary) Get(word string) (d Value, ok bool) {
 // Set saves the definition of a word.
 func (dict *Dictionary) Set(word string, val Value) {
 	dict.bindings[word] = val
+}
+
+func (dict *Dictionary) String() (s string) {
+	for w, def := range dict.bindings {
+		s = fmt.Sprintf("%s\n%s:\t%s", s, w, def)
+	}
+	return
 }

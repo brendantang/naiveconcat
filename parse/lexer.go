@@ -164,7 +164,7 @@ func (l *Lexer) commit(typ tokenType) {
 // and endPos.
 func (l *Lexer) selection() string {
 	if l.startPos >= l.endPos {
-		l.Errs <- fmt.Errorf("tried to take a selection that starts at %d but ends at %d", l.startPos, l.endPos)
+		l.Errs <- l.errorf("tried to take a selection that starts at %d but ends at %d", l.startPos, l.endPos)
 		return ""
 	}
 	return l.src[l.startPos:l.endPos]
@@ -193,9 +193,15 @@ func isWhitespace(r rune) bool {
 }
 
 func isNumeric(r rune) bool {
-	return matchRune("0123456789-+.", r)
+	return matchRune("0123456789-.", r)
 }
 
 func matchRune(valid string, r rune) bool {
 	return strings.IndexRune(valid, r) >= 0
+}
+
+func (l *Lexer) errorf(format string, args ...interface{}) error {
+	format = "lexing error at position %d: '%s': " + format
+	args = append([]interface{}{l.startPos, l.src[l.startPos:l.endPos]}, args...)
+	return fmt.Errorf(format, args...)
 }

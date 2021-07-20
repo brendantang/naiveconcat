@@ -1,7 +1,6 @@
 package interpret
 
 import (
-	"fmt"
 	"github.com/brendantang/naiveconcat/builtins"
 	"github.com/brendantang/naiveconcat/data"
 	"testing"
@@ -9,7 +8,6 @@ import (
 
 func TestInterpret(t *testing.T) {
 	for _, c := range testCases {
-		fmt.Println(c)
 		d := builtins.StandardDictionary()
 		s := data.NewStack()
 		err := Interpret(c.input, d, s)
@@ -69,14 +67,14 @@ var testCases = []struct {
 	},
 	{
 		description: "define a word that evaluates to a number",
-		input:       `55 "gf-age" define \r gf-age`,
+		input:       `55 "gf-age" define gf-age`,
 		wantStack: data.NewStack(
 			data.NewNumber(55),
 		),
 	},
 	{
 		description: "define a only saves the top item of the stack",
-		input:       `32 81 55 "gf-age" define \r gf-age`,
+		input:       `32 81 55 "gf-age" define say say gf-age`,
 		wantStack: data.NewStack(
 			data.NewNumber(55),
 		),

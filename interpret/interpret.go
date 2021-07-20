@@ -23,13 +23,18 @@ func Interpret(input string, d *data.Dictionary, s *data.Stack) error {
 	for more := true; more; {
 		select {
 		case val, ok := <-p.Out:
+			if !ok {
+				more = false
+				break
+			}
 			evalErr := eval.Eval(val, d, s)
 			if evalErr != nil {
+				more = false
 				return evalErr
 			}
-			more = ok
 		case parseErr := <-p.Errs:
 			if parseErr != nil {
+				more = false
 				return parseErr
 			}
 		}
