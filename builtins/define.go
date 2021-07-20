@@ -17,7 +17,7 @@ func define(d *data.Dictionary, s *data.Stack) error {
 		return err
 	}
 
-	d.Set(wordName.String_, definition)
+	d.Set(wordName.Str, definition)
 	return nil
 
 }

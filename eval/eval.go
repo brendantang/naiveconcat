@@ -6,29 +6,27 @@ import (
 )
 
 // Eval takes a slice of expressions
-func Eval(values []data.Value, d *data.Dictionary, s *data.Stack) error {
-	for _, v := range values {
+func Eval(val data.Value, d *data.Dictionary, s *data.Stack) error {
 
-		switch v.Type {
-		case data.Number:
-			// push a number on the stack
-			s.Push(v)
-		case data.Word:
-			// look up a word in the dictionary
-			definition, ok := d.Get(v.Word)
-			if !ok {
-				return undefinedError(v)
-			}
-			err := Eval([]data.Value{definition}, d, s)
-			if err != nil {
-				return err
-			}
-		case data.Proc:
-			// run a procedure
-			err := v.Proc.Execute(d, s)
-			if err != nil {
-				return err
-			}
+	switch val.Type {
+	case data.Number:
+		// push a number on the stack
+		s.Push(val)
+	case data.Word:
+		// look up a word in the dictionary
+		definition, ok := d.Get(val.Word)
+		if !ok {
+			return undefinedError(val)
+		}
+		err := Eval(definition, d, s)
+		if err != nil {
+			return err
+		}
+	case data.Proc:
+		// run a procedure
+		err := val.Proc.Execute(d, s)
+		if err != nil {
+			return err
 		}
 	}
 	return nil

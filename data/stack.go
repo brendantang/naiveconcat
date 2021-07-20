@@ -3,6 +3,7 @@ package data
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 // The Stack is "first-in, last-out"—you can only store data by "pushing" it
@@ -31,11 +32,12 @@ func (s *Stack) Pop() (Value, error) {
 	return d, nil
 }
 
-func (s *Stack) String() (out string) {
-	for _, v := range s.data {
-		out = fmt.Sprintf("%v ", v.String()) + out
+func (s *Stack) String() string {
+	var strs []string
+	for _, val := range s.data {
+		strs = append(strs, val.String())
 	}
-	return
+	return fmt.Sprintf("[%s]", strings.Join(strs, " "))
 }
 
 const emptyStackError = "tried to access the top item of the Stack, but the Stack is empty"
