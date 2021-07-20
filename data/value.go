@@ -36,7 +36,7 @@ func (t Type) String() (s string) {
 	case Word:
 		s = "word"
 	case Proc:
-		s = "command"
+		s = "procedure"
 	case Quotation:
 		s = "quotation"
 	}
@@ -60,7 +60,7 @@ func (v Value) String() (s string) {
 	case Word:
 		s = v.Word
 	case Proc:
-		s = fmt.Sprintf("%#v", v.Proc)
+		s = fmt.Sprintf("proc:%v", v.Proc)
 	case Quotation:
 		itemStrings := make([]string, len(v.Quotation))
 		for i, item := range v.Quotation {
