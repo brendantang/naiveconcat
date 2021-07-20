@@ -1,4 +1,2 @@
 test:
-	go test ./parse
-	go test ./eval
-	go test ./interpret
+	go test -v ./parse ./eval ./interpret

@@ -2,15 +2,16 @@ package parse
 
 import (
 	"strings"
+	"unicode"
 	"unicode/utf8"
 )
 
 const (
-	wordRunes            = "abcdefghijjklmnopqrstuvwxyz-" // wordRunes are legal characters in a word name.
-	stringDelimiter rune = '"'                            // delimiter that opens or closes a string.
-	stringEscaper   rune = '\\'                           // delimiter that escapes the following character in a string.
-	quotationOpener rune = '{'                            // delimiter that opens a quotation.
-	quotationCloser rune = '}'                            // delimiter that closes a quotation.
+	wordRunes            = "abcdefghijjklmnopqrstuvwxyz+-*/" // wordRunes are legal characters in a word name.
+	stringDelimiter rune = '"'                               // delimiter that opens or closes a string.
+	stringEscaper   rune = '\\'                              // delimiter that escapes the following character in a string.
+	quotationOpener rune = '{'                               // delimiter that opens a quotation.
+	quotationCloser rune = '}'                               // delimiter that closes a quotation.
 	eof             rune = -1
 )
 
@@ -34,21 +35,33 @@ func (l *lexer) run() {
 func defaultBehavior(l *lexer) lexingFn {
 	for r, width := l.peek(); r != eof; r, width = l.peek() {
 		switch {
+		case r == '-' || r == '.': // either could be a word or the beginning of a number.
+			if nextR, _ := l.peek(); !unicode.IsDigit(nextR) {
+				return lexWord
+			}
+			fallthrough
+
 		case isNumeric(r):
 			return lexNumber
+
 		case isWhitespace(r):
 			l.ignore(width)
+
 		case matchRune(wordRunes, r):
 			return lexWord
+
 		case r == stringDelimiter:
 			l.ignore(width) // ignore the opening "
 			return lexString
+
 		case r == quotationOpener:
 			l.selectionEnd += width
-			l.commit(tOpenQ)
+			l.commit(openQ)
+
 		case r == quotationCloser:
 			l.selectionEnd += width
-			l.commit(tCloseQ)
+			l.commit(closeQ)
+
 		default:
 			return nil
 		}
@@ -57,17 +70,17 @@ func defaultBehavior(l *lexer) lexingFn {
 }
 
 func lexNumber(l *lexer) lexingFn {
-	l.acceptOne("+-.")
+	l.acceptOne("-.")
 	l.accept("0123456789")
 	l.acceptOne(".")
 	l.accept("0123456789")
-	l.commit(tNum)
+	l.commit(num)
 	return defaultBehavior
 }
 
 func lexWord(l *lexer) lexingFn {
 	l.accept(wordRunes)
-	l.commit(tWord)
+	l.commit(word)
 	return defaultBehavior
 }
 
@@ -88,7 +101,7 @@ func lexString(l *lexer) lexingFn {
 			l.selectionEnd += width
 		}
 	}
-	l.commit(tStr)
+	l.commit(str)
 	l.ignore(width)
 	return defaultBehavior
 }

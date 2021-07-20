@@ -1,6 +1,7 @@
 package interpret
 
 import (
+	"fmt"
 	"github.com/brendantang/naiveconcat/builtins"
 	"github.com/brendantang/naiveconcat/data"
 	"testing"
@@ -8,6 +9,7 @@ import (
 
 func TestInterpret(t *testing.T) {
 	for _, c := range testCases {
+		fmt.Println(c)
 		d := builtins.StandardDictionary()
 		s := data.NewStack()
 		err := Interpret(c.input, d, s)

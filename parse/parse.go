@@ -37,24 +37,24 @@ type token struct {
 type tokenType int
 
 const (
-	tNum tokenType = iota
-	tWord
-	tStr
-	tOpenQ
-	tCloseQ
+	num tokenType = iota
+	word
+	str
+	openQ
+	closeQ
 )
 
 func (t tokenType) String() (s string) {
 	switch t {
-	case tNum:
+	case num:
 		s = "number"
-	case tStr:
+	case str:
 		s = "string"
-	case tWord:
+	case word:
 		s = "word"
-	case tOpenQ:
+	case openQ:
 		s = "open quotation"
-	case tCloseQ:
+	case closeQ:
 		s = "close quotation"
 	}
 	return
@@ -66,12 +66,14 @@ func (t token) String() string {
 
 func (t token) toValue() (val data.Value, err error) {
 	switch t.typ {
-	case tNum:
+	case num:
 		var n float64
 		n, err = strconv.ParseFloat(t.body, 64)
 		val = data.NewNumber(n)
-	case tStr:
+	case str:
 		val = data.NewString(t.body)
+	case word:
+		val = data.NewWord(t.body)
 	default:
 		err = fmt.Errorf("no parsing behavior defined for token type '%s'", t.typ)
 	}
