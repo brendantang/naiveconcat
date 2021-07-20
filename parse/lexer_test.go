@@ -8,20 +8,19 @@ func TestLexer(t *testing.T) {
 	for _, c := range testCases {
 
 		l := NewLexer(c.src)
-		l.Run()
+		go l.Run()
 
 		var got []token
 		var err error
 
 		for more := true; more; {
-			t.Logf("%#v", l)
 			select {
 			case tok, ok := <-l.Out:
-				t.Log("received from out", tok)
-				if false {
+				if !ok {
+					more = false
+					break
 				}
 				got = append(got, tok)
-				more = ok
 
 			case err = <-l.Errs:
 				if err != nil {
@@ -32,6 +31,7 @@ func TestLexer(t *testing.T) {
 					)
 				}
 			}
+
 		}
 
 		if len(got) != len(c.wantTokens) {

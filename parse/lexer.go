@@ -20,9 +20,10 @@ type Lexer struct {
 	src      string     // source text to lex.
 	Out      chan token // where lexed tokens are sent.
 	Errs     chan error // where lexing errors are sent.
-	behavior lexingFn   // function defining lexing behavior.
-	startPos int        // selection start position.
-	endPos   int        // selection end position.
+	Done     chan bool
+	behavior lexingFn // function defining lexing behavior.
+	startPos int      // selection start position.
+	endPos   int      // selection end position.
 }
 
 // NewLexer returns a *Lexer with initialized Out, Errs, and Done channels.
@@ -30,6 +31,7 @@ func NewLexer(src string) *Lexer {
 	return &Lexer{
 		src:      src,
 		Out:      make(chan token, 1),
+		Done:     make(chan bool, 1),
 		Errs:     make(chan error, 1),
 		behavior: lexMain,
 	}
@@ -45,13 +47,16 @@ func (l *Lexer) Run() {
 		l.behavior = l.behavior(l)
 	}
 	close(l.Out)
+	close(l.Errs)
+	l.Done <- true
+	close(l.Done)
 }
 
 func lexMain(l *Lexer) lexingFn {
 	for r, width := l.peek(); r != EOF; r, width = l.peek() {
 		switch {
 		case r == '-' || r == '.': // either could be a word or the beginning of a number.
-			if nextR, _ := l.peek(); !unicode.IsDigit(nextR) {
+			if nextR, _ := l.runeAt(l.endPos + width); !unicode.IsDigit(nextR) {
 				return lexWord
 			}
 			fallthrough
@@ -126,7 +131,7 @@ func (l *Lexer) peek() (r rune, width int) {
 	if l.endPos >= len(l.src) {
 		return EOF, 0
 	}
-	return utf8.DecodeRuneInString(l.src[l.endPos:])
+	return l.runeAt(l.endPos)
 }
 
 // next returns the next rune and includes it in the selection.
@@ -136,9 +141,13 @@ func (l *Lexer) next() (r rune) {
 		return EOF
 	}
 
-	r, width := utf8.DecodeRuneInString(l.src[l.endPos:])
+	r, width := l.peek()
 	l.endPos += width
 	return r
+}
+
+func (l *Lexer) runeAt(pos int) (r rune, width int) {
+	return utf8.DecodeRuneInString(l.src[pos:])
 }
 
 // commit uses the selection and given type to initialize a token and sends it

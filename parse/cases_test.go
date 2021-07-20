@@ -14,7 +14,7 @@ type testCase struct {
 var testCases = []testCase{
 	{"a number", "23", []token{{num, "23"}}, []data.Value{data.NewNumber(23)}},
 	{"negative number", "-1000000", []token{{num, "-1000000"}}, []data.Value{data.NewNumber(-1000000)}},
-	{"decimal number", "1000.333", []token{{num, "-1000.333"}}, []data.Value{data.NewNumber(-1000.333)}},
+	{"decimal number", "1000.333", []token{{num, "1000.333"}}, []data.Value{data.NewNumber(1000.333)}},
 	{
 		"multiple numbers",
 		"23 -11 23.003 -12.32",
