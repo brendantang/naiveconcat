@@ -76,7 +76,7 @@ func REPL(cfg Config) error {
 		}
 
 		if cfg.DebugMode {
-			fmt.Println(s)
+			fmt.Printf("%s\n\n", s)
 		}
 	}
 	return nil
