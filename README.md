@@ -4,6 +4,7 @@ WIP.
 It doesn't do much yet (see below), but if you want to try it you can download and run the `naiveconcat` binary, or you can clone this repo and `go run .` (assuming you have go installed).
 
 TODOs:
+- [ ] comments with `--`
 - [ ] `let` binds word definitions in the scope of a surrounding quotation
 - [ ] flow control with `if`
 
