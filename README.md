@@ -12,8 +12,10 @@ Status:
   
   > {dup *} "sq" define
   [4]
+  > sq
+  [4 {dup *}]
   
-  > sq apply
+  > apply
   [16]
   ```
 - 2021-07-11 - Addition, subtraction, multiplication, and division.
