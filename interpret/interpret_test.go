@@ -1,100 +1,73 @@
 package interpret
 
 import (
+	"bufio"
+	"fmt"
 	"github.com/brendantang/naiveconcat/builtins"
 	"github.com/brendantang/naiveconcat/data"
-	"testing"
+	"strings"
+	_ "testing"
 )
 
-func TestInterpret(t *testing.T) {
-	for _, c := range testCases {
-		d := builtins.StandardDictionary()
-		s := data.NewStack()
-		err := Interpret(c.input, d, s)
-		if err != nil {
-			t.Fatalf(
-				"FAIL: %s\nInterpreter error: %v",
-				c.description,
-				err,
-			)
-		}
-		if s.String() != c.wantStack.String() {
-			t.Fatalf(
-				"FAIL: %s\nWant: %s\nHave: %s\n",
-				c.description,
-				c.wantStack,
-				s,
-			)
-		}
-
+func testingConfig(src string) Config {
+	return Config{
+		Prompt:       "",
+		DebugMode:    true,
+		Input:        bufio.NewReader(strings.NewReader(src)),
+		InitialDict:  builtins.StandardDictionary(),
+		InitialStack: data.NewStack(),
 	}
-
 }
 
-var testCases = []struct {
-	description string
-	input       string
-	wantStack   *data.Stack
-}{
-	{
-		description: "a number",
-		input:       "42",
-		wantStack:   data.NewStack(data.NewNumber(42)),
-	},
-	{
-		description: "multiple numbers",
-		input:       "42\r31.4\r12.11111",
-		wantStack: data.NewStack(
-			data.NewNumber(12.11111),
-			data.NewNumber(31.4),
-			data.NewNumber(42),
-		),
-	},
-	{
-		description: "arithmetic",
-		input:       "12 42 + 4 - 10 * 2 /",
-		wantStack: data.NewStack(
-			data.NewNumber(250),
-		),
-	},
-	{
-		description: "strings",
-		input:       `"I'm a string" "I am another string!"`,
-		wantStack: data.NewStack(
-			data.NewString("I am another string!"),
-			data.NewString("I'm a string"),
-		),
-	},
-	{
-		description: "define a word that evaluates to a number",
-		input:       `55 "gf-age" define gf-age`,
-		wantStack: data.NewStack(
-			data.NewNumber(55),
-		),
-	},
-	{
-		description: "define only saves the top item of the stack",
-		input:       `32 81 55 "gf-age" define say say gf-age`,
-		wantStack: data.NewStack(
-			data.NewNumber(55),
-		),
-	},
-	{
-		description: "define a word that evaluates to a procedure",
-		input:       `{ 1 + } "increment" define 81 increment apply`,
-		wantStack: data.NewStack(
-			data.NewNumber(82),
-		),
-	},
-	{
-		description: "quotation",
-		input:       "{1 2 +}",
-		wantStack: data.NewStack(
-			data.NewQuotation(
-				data.NewNumber(1),
-				data.NewNumber(2),
-				data.NewWord("+"),
-			),
-		),
-	},
+func ExampleInterpret() {
+	d, s := builtins.StandardDictionary(), data.NewStack()
+	src := `-- From '--' to the end of a line is a comment.
+
+		"foo" 2 "bar"   -- Literal values get pushed on the stack.
+
+		42 2 *          -- The '*' word pops two numbers off the top of the stack,
+		                -- multiplies them together, and pushes the result back on the stack.
+
+		say	        -- The 'say' word pops the top value off the stack and prints it.
+		`
+	Interpret(src, d, s)
+	fmt.Println(s)
+
+	// Output:
+	// 84
+	// bar
+	// ["foo" 2]
+}
+func ExampleInterpret_words() {
+	d, s := builtins.StandardDictionary(), data.NewStack()
+
+	src := `{ dup * } "square" define -- stack: []
+		2 square apply            -- [4]
+		square apply              -- [16]
+		say                       -- []
+		`
+	Interpret(src, d, s)
+	// Output:
+	// 16
+}
+
+// Let bindings are local to their enclosing quotation(s).
+func ExampleInterpret_let() {
+	d, s := builtins.StandardDictionary(), data.NewStack()
+
+	src := `3 "x" let
+		x say
+
+		-- x is 2 in the outer quotation, and 1 in the inner.
+		{2 "x" let {1 "x" let x say} x say} apply apply
+
+		x say
+		`
+
+	Interpret(src, d, s)
+	// Output:
+	// 3
+	// 2
+	// 1
+	// 3
 }

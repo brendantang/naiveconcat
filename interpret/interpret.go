@@ -43,6 +43,7 @@ func Interpret(input string, d *data.Dictionary, s *data.Stack) error {
 }
 
 type Config struct {
+	Prompt       string
 	DebugMode    bool
 	Input        *bufio.Reader
 	InitialDict  *data.Dictionary
@@ -51,6 +52,7 @@ type Config struct {
 
 func DefaultConfig() Config {
 	return Config{
+		Prompt:       "> ",
 		DebugMode:    true,
 		Input:        bufio.NewReader(os.Stdin),
 		InitialDict:  builtins.StandardDictionary(),
@@ -63,7 +65,7 @@ func REPL(cfg Config) error {
 	dict, s := cfg.InitialDict, cfg.InitialStack
 	for true {
 		// read a line from std in
-		fmt.Print("> ")
+		fmt.Print(cfg.Prompt)
 		input, err := cfg.Input.ReadString('\n')
 		if err != nil {
 			return fmt.Errorf("Error reading input: %e", err)
