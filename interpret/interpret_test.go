@@ -73,10 +73,17 @@ var testCases = []struct {
 		),
 	},
 	{
-		description: "define a only saves the top item of the stack",
+		description: "define only saves the top item of the stack",
 		input:       `32 81 55 "gf-age" define say say gf-age`,
 		wantStack: data.NewStack(
 			data.NewNumber(55),
+		),
+	},
+	{
+		description: "define a word that evaluates to a procedure",
+		input:       `{ 1 + } "increment" define 81 increment apply`,
+		wantStack: data.NewStack(
+			data.NewNumber(82),
 		),
 	},
 	{
@@ -86,7 +93,7 @@ var testCases = []struct {
 			data.NewQuotation(
 				data.NewNumber(1),
 				data.NewNumber(2),
-				data.NewProc(builtins.Add),
+				data.NewWord("+"),
 			),
 		),
 	},

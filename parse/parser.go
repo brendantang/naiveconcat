@@ -34,6 +34,31 @@ func (p *Parser) Run() {
 			p.Out <- data.NewWord(tok.body)
 		case str:
 			p.Out <- data.NewString(tok.body)
+		case openQ:
+			subIn := make(chan token, 1)
+			subParser := NewParser(subIn)
+			go subParser.Run()
+			for subTok, ok := <-p.in; !ok || subTok.typ != closeQ; subTok, ok = <-p.in {
+				subParser.in <- subTok
+			}
+			close(subIn)
+			var quotedVals []data.Value
+			for more := true; more; {
+				select {
+				case subVal, ok := <-subParser.Out:
+					if !ok {
+						more = ok
+						break
+					}
+					quotedVals = append(quotedVals, subVal)
+
+				case err := <-subParser.Errs:
+					if err != nil {
+						p.Errs <- err
+					}
+				}
+			}
+			p.Out <- data.NewQuotation(quotedVals...)
 		}
 	}
 	close(p.Out)

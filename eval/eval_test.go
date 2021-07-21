@@ -123,4 +123,75 @@ var testCases = []testCase{
 			data.NewNumber(100),
 		),
 	},
+	{
+		"a quotation gets pushed on the stack",
+		&data.Stack{},
+		[]data.Value{
+			data.NewQuotation(
+				data.NewNumber(1),
+				data.NewWord("+"),
+			),
+		},
+		data.NewStack(
+			data.NewQuotation(
+				data.NewNumber(1),
+				data.NewWord("+"),
+			),
+		),
+	},
+	{
+		"apply a quotation to evaluate it",
+		data.NewStack(
+			data.NewQuotation(
+				data.NewNumber(1),
+				data.NewWord("+"),
+			),
+			data.NewNumber(100),
+		),
+		[]data.Value{
+			data.NewWord("apply"),
+		},
+		data.NewStack(
+			data.NewNumber(101),
+		),
+	},
+	{
+		"nested quotation application",
+		data.NewStack(
+			data.NewQuotation(
+				data.NewQuotation(
+					data.NewQuotation(
+						data.NewNumber(3),
+					),
+				),
+			),
+		),
+		[]data.Value{
+			data.NewWord("apply"),
+			data.NewWord("apply"),
+		},
+		data.NewStack(
+			data.NewQuotation(
+				data.NewNumber(3),
+			),
+		),
+	},
+	{
+		"define a word that evaluates to a procedure",
+		&data.Stack{},
+		[]data.Value{
+			data.NewQuotation(
+				data.NewNumber(1),
+				data.NewWord("+"),
+			),
+			data.NewString("increment"),
+			data.NewWord("define"),
+			data.NewNumber(11),
+			data.NewWord("increment"),
+			data.NewWord("apply"),
+		},
+		data.NewStack(
+			data.NewNumber(12),
+		),
+	},
 }
