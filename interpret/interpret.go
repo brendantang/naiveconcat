@@ -6,11 +6,9 @@ package interpret
 import (
 	"bufio"
 	"fmt"
-	"github.com/brendantang/naiveconcat/builtins"
 	"github.com/brendantang/naiveconcat/data"
 	"github.com/brendantang/naiveconcat/eval"
 	"github.com/brendantang/naiveconcat/parse"
-	"os"
 )
 
 // Interpret takes input, parses it into expressions, and then evaluates those
@@ -44,20 +42,10 @@ func Interpret(input string, d *data.Dictionary, s *data.Stack) error {
 
 type Config struct {
 	Prompt       string
-	DebugMode    bool
+	Verbose      bool
 	Input        *bufio.Reader
 	InitialDict  *data.Dictionary
 	InitialStack *data.Stack
-}
-
-func DefaultConfig() Config {
-	return Config{
-		Prompt:       "> ",
-		DebugMode:    true,
-		Input:        bufio.NewReader(os.Stdin),
-		InitialDict:  builtins.StandardDictionary(),
-		InitialStack: data.NewStack(),
-	}
 }
 
 // REPL (read-eval-print-loop) starts an interactive prompt.
@@ -77,7 +65,7 @@ func REPL(cfg Config) error {
 			return err
 		}
 
-		if cfg.DebugMode {
+		if cfg.Verbose {
 			fmt.Printf("%s\n\n", s)
 		}
 	}
