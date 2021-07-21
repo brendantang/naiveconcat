@@ -12,6 +12,7 @@ Status:
   
   > {dup *} "sq" define
   [4]
+  
   > sq
   [4 {dup *}]
   
