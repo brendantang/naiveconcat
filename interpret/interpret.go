@@ -40,12 +40,13 @@ func Interpret(input string, d *data.Dictionary, s *data.Stack) error {
 	return nil
 }
 
+// Config stores configuration details for the REPL.
 type Config struct {
-	Prompt       string
-	Verbose      bool
-	Input        *bufio.Reader
-	InitialDict  *data.Dictionary
-	InitialStack *data.Stack
+	Prompt       string           // the string that appears when waiting for input.
+	Verbose      bool             // when true, the stack is printed for each REPL loop.
+	Input        *bufio.Reader    // provides the source text for the REPL to interpret.
+	InitialDict  *data.Dictionary // initial dictionary when the program starts.
+	InitialStack *data.Stack      // initial stack of data when the program starts.
 }
 
 // REPL (read-eval-print-loop) starts an interactive prompt.

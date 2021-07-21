@@ -1,6 +1,5 @@
-// naiveconcat is a minimal concatenative language.
-//
-//
+// naiveconcat is a minimal concatenative programming language, built for fun.
+// Work in progress.
 package main
 
 import (
