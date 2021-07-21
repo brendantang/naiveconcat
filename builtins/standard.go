@@ -14,6 +14,7 @@ func StandardDictionary() *data.Dictionary {
 			"*":      data.NewProc(multiply),
 			"/":      data.NewProc(divide),
 			"define": data.NewProc(define),
+			"dup":    data.NewProc(dup),
 		},
 	)
 }
