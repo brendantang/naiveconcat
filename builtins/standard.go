@@ -10,12 +10,14 @@ func StandardDictionary() *data.Dictionary {
 		nil,
 		map[string]data.Value{
 			"say":    data.NewProc(say),
-			"+":      data.NewProc(Add),
+			"+":      data.NewProc(add),
 			"-":      data.NewProc(subtract),
 			"*":      data.NewProc(multiply),
 			"/":      data.NewProc(divide),
 			"define": data.NewProc(define),
 			"dup":    data.NewProc(dup),
+			"true":   data.NewBoolean(true),
+			"false":  data.NewBoolean(false),
 		},
 	)
 }

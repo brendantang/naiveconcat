@@ -1,8 +1,6 @@
 package parse
 
 import (
-	"log"
-	"os"
 	"testing"
 	"time"
 )
@@ -11,7 +9,7 @@ func TestLexer(t *testing.T) {
 	for _, c := range testCases {
 
 		l := NewLexer(c.src)
-		l.Debug = log.New(os.Stderr, "LEX:", log.LstdFlags)
+		//l.Debug = log.New(os.Stderr, "LEX:", log.LstdFlags)
 		go l.Run()
 
 		var got []token

@@ -10,9 +10,9 @@ func TestEval(t *testing.T) {
 	for i, c := range testCases {
 		d, s := builtins.StandardDictionary(), c.stack
 		for _, val := range c.vals {
-			Eval(val, d, s)
 			//t.Log("\nDICT", d)
-			t.Log("\nSTACK\t", s)
+			//t.Log("\nSTACK\t", s)
+			Eval(val, d, s)
 		}
 		if c.stack.String() != c.wantStack.String() {
 			failEvalTest(t, i, c, c.stack, "")
@@ -227,5 +227,22 @@ var testCases = []testCase{
 			data.NewString("inner value"),
 			data.NewString("outer value"),
 		),
+	},
+	{
+		"booleans",
+		&data.Stack{},
+		[]data.Value{data.NewBoolean(false), data.NewBoolean(true)},
+		data.NewStack(data.NewBoolean(true), data.NewBoolean(false)),
+	},
+	{
+		"conditional flow control using `when`",
+		data.NewStack(
+			data.NewBoolean(false),
+			data.NewString("This value won't be on the stack"),
+			data.NewBoolean(true),
+			data.NewString("Hello!"),
+		),
+		[]data.Value{data.NewWord("when"), data.NewWord("when")},
+		data.NewStack(data.NewString("Hello!")),
 	},
 }

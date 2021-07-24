@@ -4,7 +4,7 @@ import (
 	"github.com/brendantang/naiveconcat/data"
 )
 
-func Add(d *data.Dictionary, s *data.Stack) error {
+func add(d *data.Dictionary, s *data.Stack) error {
 	a, err := s.Pop()
 	if err != nil {
 		return err

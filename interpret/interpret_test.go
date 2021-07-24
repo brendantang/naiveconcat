@@ -18,7 +18,10 @@ func ExampleInterpret() {
 
 		say	        -- The 'say' word pops the top value off the stack and prints it.
 		`
-	Interpret(src, d, s, true)
+	err := Interpret(src, d, s, false)
+	if err != nil {
+		fmt.Println(err)
+	}
 	fmt.Println(s)
 
 	// Output:
@@ -34,7 +37,10 @@ func ExampleInterpret_words() {
 		square apply              -- [16]
 		say                       -- []
 		`
-	Interpret(src, d, s, true)
+	err := Interpret(src, d, s, false)
+	if err != nil {
+		fmt.Println(err)
+	}
 	// Output:
 	// 16
 }
@@ -52,10 +58,30 @@ func ExampleInterpret_locals() {
 		x say
 		`
 
-	Interpret(src, d, s, true)
+	err := Interpret(src, d, s, false)
+	if err != nil {
+		fmt.Println(err)
+	}
 	// Output:
 	// 3
 	// 2
 	// 1
 	// 3
+}
+
+// Flow control using "when"
+func ExampleInterpret_conditions() {
+	d, s := builtins.StandardDictionary(), data.NewStack()
+
+	src := `"You won't see this message" false when
+		"You will see this message" true when
+		say
+		`
+
+	err := Interpret(src, d, s, false)
+	if err != nil {
+		fmt.Println(err)
+	}
+	// Output:
+	// "You will see this message"
 }

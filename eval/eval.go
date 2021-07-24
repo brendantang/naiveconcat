@@ -10,7 +10,7 @@ import (
 func Eval(val data.Value, d *data.Dictionary, s *data.Stack) error {
 
 	switch val.Type {
-	case data.Number, data.String, data.Quotation:
+	case data.Number, data.String, data.Quotation, data.Boolean:
 		// push a literal value on the stack
 		s.Push(val)
 	case data.Word:
@@ -38,6 +38,28 @@ func Eval(val data.Value, d *data.Dictionary, s *data.Stack) error {
 			return nil
 
 		}
+		// handle special `when` keyword
+		if val.Word == "when" {
+			predicate, err := s.Pop()
+			if err != nil {
+				return err
+			}
+			if predicate.Type != data.Boolean {
+				return data.TypeError(predicate, data.Boolean)
+			}
+			consequent, err := s.Pop()
+			if err != nil {
+				return err
+			}
+			if predicate.Bool {
+				err := Eval(consequent, d, s)
+				if err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+
 		// look up a word in the dictionary
 		definition, ok := d.Get(val.Word)
 		if !ok {

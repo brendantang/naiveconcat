@@ -14,6 +14,7 @@ type Value struct {
 	Proc      Procedure
 	Str       string
 	Quotation []Value
+	Bool      bool
 }
 
 // Type describes the internal type of a Value.
@@ -25,6 +26,7 @@ const (
 	Word
 	Proc
 	Quotation
+	Boolean
 )
 
 func (t Type) String() (s string) {
@@ -39,6 +41,8 @@ func (t Type) String() (s string) {
 		s = "procedure"
 	case Quotation:
 		s = "quotation"
+	case Boolean:
+		s = "boolean"
 	}
 	return
 }
@@ -69,6 +73,12 @@ func (v Value) String() (s string) {
 		s = fmt.Sprintf("{%s}", strings.Join(itemStrings, " "))
 	case String:
 		s = fmt.Sprintf("\"%s\"", v.Str)
+	case Boolean:
+		if v.Bool {
+			s = "TRUE"
+		} else {
+			s = "FALSE"
+		}
 	}
 	return
 }
@@ -110,6 +120,14 @@ func NewProc(fn func(*Dictionary, *Stack) error) Value {
 	return Value{
 		Type: Proc,
 		Proc: Procedure{fn},
+	}
+}
+
+// NewBoolean constructs a Boolean Value from a bool.
+func NewBoolean(b bool) Value {
+	return Value{
+		Type: Boolean,
+		Bool: b,
 	}
 }
 
