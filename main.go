@@ -31,7 +31,10 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		interpret.Interpret(string(content), builtins.StandardDictionary(), data.NewStack(), *debug)
+		err = interpret.Interpret(string(content), builtins.StandardDictionary(), data.NewStack(), *debug)
+		if err != nil {
+			log.Fatal(err)
+		}
 	} else {
 		log.Fatal(interpret.REPL(cfg))
 	}

@@ -8,6 +8,8 @@ import (
 // Eval evaluates a value in the context of a Dictionary and Stack, possibly mutating
 // both.
 func Eval(val data.Value, d *data.Dictionary, s *data.Stack) error {
+	//fmt.Println(val)
+	//defer fmt.Println(s)
 
 	switch val.Type {
 	case data.Number, data.String, data.Quotation, data.Boolean:
@@ -38,8 +40,8 @@ func Eval(val data.Value, d *data.Dictionary, s *data.Stack) error {
 			return nil
 
 		}
-		// handle special `when` keyword
-		if val.Word == "when" {
+		// handle special `then` keyword
+		if val.Word == "then" {
 			predicate, err := s.Pop()
 			if err != nil {
 				return err

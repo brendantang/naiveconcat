@@ -8,7 +8,7 @@ import (
 
 func TestEval(t *testing.T) {
 	for i, c := range testCases {
-		d, s := builtins.StandardDictionary(), c.stack
+		d, s := builtins.Dict(), c.stack
 		for _, val := range c.vals {
 			//t.Log("\nDICT", d)
 			//t.Log("\nSTACK\t", s)
@@ -235,14 +235,14 @@ var testCases = []testCase{
 		data.NewStack(data.NewBoolean(true), data.NewBoolean(false)),
 	},
 	{
-		"conditional flow control using `when`",
+		"conditional flow control using `then`",
 		data.NewStack(
 			data.NewBoolean(false),
 			data.NewString("This value won't be on the stack"),
 			data.NewBoolean(true),
 			data.NewString("Hello!"),
 		),
-		[]data.Value{data.NewWord("when"), data.NewWord("when")},
+		[]data.Value{data.NewWord("then"), data.NewWord("then")},
 		data.NewStack(data.NewString("Hello!")),
 	},
 }

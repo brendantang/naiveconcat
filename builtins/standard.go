@@ -4,8 +4,8 @@ import (
 	"github.com/brendantang/naiveconcat/data"
 )
 
-// StandardDictionary returns a data.Dictionary with bindings for the standard primitive words.
-func StandardDictionary() *data.Dictionary {
+// Dict returns a data.Dictionary with bindings for the standard primitive words.
+func Dict() *data.Dictionary {
 	return data.NewDictionary(
 		nil,
 		map[string]data.Value{
@@ -18,6 +18,7 @@ func StandardDictionary() *data.Dictionary {
 			"dup":    data.NewProc(dup),
 			"true":   data.NewBoolean(true),
 			"false":  data.NewBoolean(false),
+			"not":    data.NewProc(not),
 		},
 	)
 }

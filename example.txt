@@ -1,7 +1,17 @@
-"foo" say
+-- run this file by executing `go run . example.txt` or `naiveconcat example.txt`
 
-{"foo" "x" define {"bar" "x" define}}
-apply
-x say
-apply
-x say
+{"consequent" say} true then apply
+-- "consequent"
+
+
+{ 
+    "predicate" define 
+    "alternative" define
+    "consequent" define
+    consequent predicate then
+    alternative predicate not then
+    apply
+} "if" define
+
+{"consequent" say} {"alternative" say} false if apply 
+-- "alternative"

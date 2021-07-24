@@ -8,7 +8,7 @@ import (
 )
 
 func ExampleInterpret() {
-	d, s := builtins.StandardDictionary(), data.NewStack()
+	d, s := builtins.Dict(), data.NewStack()
 	src := `-- From '--' to the end of a line is a comment.
 
 		"foo" 2 "bar"   -- Literal values get pushed on the stack.
@@ -30,7 +30,7 @@ func ExampleInterpret() {
 }
 
 func ExampleInterpret_words() {
-	d, s := builtins.StandardDictionary(), data.NewStack()
+	d, s := builtins.Dict(), data.NewStack()
 
 	src := `{ dup * } "square" define -- stack: []
 		2 square apply            -- [4]
@@ -47,7 +47,7 @@ func ExampleInterpret_words() {
 
 // "Define" bindings are local to their enclosing quotation(s).
 func ExampleInterpret_locals() {
-	d, s := builtins.StandardDictionary(), data.NewStack()
+	d, s := builtins.Dict(), data.NewStack()
 
 	src := `3 "x" define
 		x say
@@ -69,12 +69,12 @@ func ExampleInterpret_locals() {
 	// 3
 }
 
-// Flow control using "when"
+// Flow control using "then"
 func ExampleInterpret_conditions() {
-	d, s := builtins.StandardDictionary(), data.NewStack()
+	d, s := builtins.Dict(), data.NewStack()
 
-	src := `"You won't see this message" false when
-		"You will see this message" true when
+	src := `"You won't see this message" false then
+		"You will see this message" true then
 		say
 		`
 
