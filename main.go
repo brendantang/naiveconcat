@@ -21,7 +21,7 @@ func main() {
 		Prompt:       "> ",
 		Verbose:      *verbose,
 		Input:        bufio.NewReader(os.Stdin),
-		InitialDict:  builtins.StandardDictionary(),
+		InitialDict:  builtins.Dict(),
 		InitialStack: data.NewStack(),
 		Debug:        *debug,
 	}
@@ -31,7 +31,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		err = interpret.Interpret(string(content), builtins.StandardDictionary(), data.NewStack(), *debug)
+		err = interpret.Interpret(string(content), builtins.Dict(), data.NewStack(), *debug)
 		if err != nil {
 			log.Fatal(err)
 		}

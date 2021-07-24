@@ -1,15 +1,54 @@
 package interpret
 
 import (
-	"fmt"
 	"github.com/brendantang/naiveconcat/builtins"
 	"github.com/brendantang/naiveconcat/data"
-	_ "testing"
+	"io/ioutil"
+	"os"
+	"strings"
+	"testing"
 )
 
-func ExampleInterpret() {
-	d, s := builtins.Dict(), data.NewStack()
-	src := `-- From '--' to the end of a line is a comment.
+func TestInterpret(t *testing.T) {
+	for _, c := range interpretTestCases {
+
+		// capture stdout during the test case
+		normalStdout := os.Stdout
+		tmp, err := ioutil.TempFile("", "captured_output")
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer os.Remove(tmp.Name())
+		os.Stdout = tmp
+
+		// interpret the test case
+		d, s := builtins.Dict(), data.NewStack()
+		err = Interpret(c.src, d, s, false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		output, err := ioutil.ReadFile(tmp.Name())
+		if err != nil {
+			t.Fatal(err)
+		}
+		got := strings.Trim(string(output), "\n\r \t")
+		if got != c.want {
+			t.Fatalf("FAIL: %s\nwant: %#v\ngot: %#v\n", c.description, c.want, got)
+		}
+
+		// set stdout back to normal
+		os.Stdout = normalStdout
+	}
+}
+
+var interpretTestCases = []struct {
+	description string
+	src         string
+	want        string
+}{
+	{
+		"some values",
+		`-- From '--' to the end of a line is a comment.
 
 		"foo" 2 "bar"   -- Literal values get pushed on the stack.
 
@@ -17,71 +56,36 @@ func ExampleInterpret() {
 		                -- multiplies them together, and pushes the result back on the stack.
 
 		say	        -- The 'say' word pops the top value off the stack and prints it.
+		`,
+		"84",
+	},
+	{
+		"use `then` to implement `if` with consequent and alternative",
 		`
-	err := Interpret(src, d, s, false)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(s)
+		{ 
+		  "predicate" define 
+		  "alternative" define
+		  "consequent" define
+		  consequent predicate then
+		  alternative predicate not then
+		  apply
+		} "if" define
 
-	// Output:
-	// 84
-	// ["foo" 2 "bar"]
-}
-
-func ExampleInterpret_words() {
-	d, s := builtins.Dict(), data.NewStack()
-
-	src := `{ dup * } "square" define -- stack: []
-		2 square apply            -- [4]
-		square apply              -- [16]
-		say                       -- []
+		{"consequent" say} {"alternative" say} false if apply`,
+		`"alternative"`,
+	},
+	{
+		"use `then` to implement a recursive function",
 		`
-	err := Interpret(src, d, s, false)
-	if err != nil {
-		fmt.Println(err)
-	}
-	// Output:
-	// 16
-}
+		{
+			"x" define
+			x 0 = "done" define
+			{ x say } done then
+			{ x say x 1 - countdown apply } done not then apply
+		} "countdown" define
 
-// "Define" bindings are local to their enclosing quotation(s).
-func ExampleInterpret_locals() {
-	d, s := builtins.Dict(), data.NewStack()
-
-	src := `3 "x" define
-		x say
-
-		-- x is 2 in the outer quotation, and 1 in the inner.
-		{2 "x" define {1 "x" define x say} x say} apply apply
-
-		x say
-		`
-
-	err := Interpret(src, d, s, false)
-	if err != nil {
-		fmt.Println(err)
-	}
-	// Output:
-	// 3
-	// 2
-	// 1
-	// 3
-}
-
-// Flow control using "then"
-func ExampleInterpret_conditions() {
-	d, s := builtins.Dict(), data.NewStack()
-
-	src := `"You won't see this message" false then
-		"You will see this message" true then
-		say
-		`
-
-	err := Interpret(src, d, s, false)
-	if err != nil {
-		fmt.Println(err)
-	}
-	// Output:
-	// "You will see this message"
+		5 countdown apply
+		`,
+		`5 4 3 2 1`,
+	},
 }

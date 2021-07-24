@@ -37,3 +37,10 @@ func (dict *Dictionary) String() (s string) {
 	}
 	return
 }
+
+func (dict *Dictionary) Depth() int {
+	if dict.parent == nil {
+		return 0
+	}
+	return 1 + dict.parent.Depth()
+}

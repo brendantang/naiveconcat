@@ -6,7 +6,8 @@ It doesn't do much yet (see below), but if you want to try it you can download a
 TODOs:
 - [x] comments with `--`
 - [x] `define` binds word definitions in the scope of a surrounding quotation
-- [ ] flow control with `if`
+- [x] flow control with `then`
+- [ ] iteration
 
 Status:
 - 2021-07-24 - Quotations are closures—words you define inside a quotation are local to that quotation. Comment out to end of line with `--`.

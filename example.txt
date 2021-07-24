@@ -5,13 +5,56 @@
 
 
 { 
-    "predicate" define 
-    "alternative" define
-    "consequent" define
-    consequent predicate then
-    alternative predicate not then
-    apply
+  "predicate" define 
+  "alternative" define
+  "consequent" define
+  consequent predicate then
+  alternative predicate not then
+  apply
 } "if" define
 
 {"consequent" say} {"alternative" say} false if apply 
 -- "alternative"
+
+{ 1 2 3 4 } { say } each
+-- 1 2 3 4
+
+{ { apply then } each } "cond" define
+
+{{"not me" false} {"me" true} {"me either" false} {"me neither" false}} cond apply say
+-- "me"
+
+--{ "iter" define "acc" define "items" define items lop "head" define "tail" define { head acc iter apply } { { tail acc iter reduce apply } acc iter apply } tail length 0 = if } "reduce" define
+
+-- { 1 2 3 } 0 {+} reduce apply say
+-- [ 6 ]
+
+--{ 
+--  "x" define
+--  0 x = "is-zero" define
+--  1 x = "is-one" define
+--  is-zero is-one or not "is-n" define
+--  { { 0 is-zero } { 1 is-one } { x 1 - fib is-n }} cond apply 
+--} "fib" define
+
+--4 fib
+
+--{ 
+--  "i" define
+--  "check" define
+--  "f" define
+
+--  {i f check {f} while} {i check} then
+--} "while" define
+
+--0 { 3 = not } {1 + dup say } while
+
+{
+  "x" define
+  x 0 = "done" define
+  { x } done then
+  { x x 1 - countdown apply } done not then apply
+} "countdown" define
+
+5 countdown apply
+

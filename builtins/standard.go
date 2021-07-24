@@ -14,11 +14,15 @@ func Dict() *data.Dictionary {
 			"-":      data.NewProc(subtract),
 			"*":      data.NewProc(multiply),
 			"/":      data.NewProc(divide),
+			"=":      data.NewProc(equal),
 			"define": data.NewProc(define),
 			"dup":    data.NewProc(dup),
 			"true":   data.NewBoolean(true),
 			"false":  data.NewBoolean(false),
 			"not":    data.NewProc(not),
+			"or":     data.NewProc(or),
+			"length": data.NewProc(length),
+			"lop":    data.NewProc(lop),
 		},
 	)
 }

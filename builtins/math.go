@@ -83,3 +83,23 @@ func divide(d *data.Dictionary, s *data.Stack) error {
 
 	return nil
 }
+
+func equal(d *data.Dictionary, s *data.Stack) error {
+	a, err := s.Pop()
+	if err != nil {
+		return err
+	}
+	if a.Type != data.Number {
+		return data.TypeError(a, data.Number)
+	}
+	b, err := s.Pop()
+	if err != nil {
+		return err
+	}
+	if b.Type != data.Number {
+		return data.TypeError(b, data.Number)
+	}
+	s.Push(data.NewBoolean(b.Number == a.Number))
+
+	return nil
+}

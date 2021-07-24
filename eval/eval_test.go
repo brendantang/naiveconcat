@@ -10,9 +10,14 @@ func TestEval(t *testing.T) {
 	for i, c := range testCases {
 		d, s := builtins.Dict(), c.stack
 		for _, val := range c.vals {
+			//t.Log("\nVAL", val)
 			//t.Log("\nDICT", d)
 			//t.Log("\nSTACK\t", s)
-			Eval(val, d, s)
+			err := Eval(val, d, s)
+			if err != nil {
+				failEvalTest(t, i, c, c.stack, err.Error())
+			}
+
 		}
 		if c.stack.String() != c.wantStack.String() {
 			failEvalTest(t, i, c, c.stack, "")
@@ -244,5 +249,68 @@ var testCases = []testCase{
 		),
 		[]data.Value{data.NewWord("then"), data.NewWord("then")},
 		data.NewStack(data.NewString("Hello!")),
+	},
+	{
+		"`then` implements `if` with consequent and alternative",
+		data.NewStack(
+			data.NewQuotation(
+				data.NewString("predicate"),
+				data.NewWord("define"),
+				data.NewString("alternative"),
+				data.NewWord("define"),
+				data.NewString("consequent"),
+				data.NewWord("define"),
+				data.NewWord("consequent"), data.NewWord("predicate"), data.NewWord("then"),
+				data.NewWord("alternative"), data.NewWord("predicate"), data.NewWord("not"), data.NewWord("then"),
+			),
+		),
+		[]data.Value{
+			data.NewString("if"), data.NewWord("define"),
+			data.NewString("This value will be on the stack."),
+			data.NewString("This value won't."),
+			data.NewBoolean(true),
+			data.NewWord("if"),
+			data.NewWord("apply"),
+		},
+		data.NewStack(data.NewString("This value will be on the stack.")),
+	},
+	{
+		"simple recursive definition",
+		data.NewStack(
+			data.NewQuotation(
+				data.NewString("x"),
+				data.NewWord("define"),
+				data.NewWord("x"), data.NewNumber(0), data.NewWord("="), data.NewString("done"), data.NewWord("define"),
+				data.NewQuotation(
+					data.NewWord("x"), //data.NewWord("say"),
+				),
+				data.NewWord("done"), data.NewWord("then"),
+
+				data.NewQuotation(
+					data.NewWord("x"), // Push on the stack
+					data.NewWord("x"), data.NewNumber(1), data.NewWord("-"), data.NewWord("countdown"), data.NewWord("apply"),
+				),
+				data.NewWord("done"), data.NewWord("not"), data.NewWord("then"), data.NewWord("apply"),
+			),
+		),
+		[]data.Value{
+			data.NewString("countdown"), data.NewWord("define"),
+			data.NewNumber(10),
+			data.NewWord("countdown"),
+			data.NewWord("apply"),
+		},
+		data.NewStack(
+			data.NewNumber(0),
+			data.NewNumber(1),
+			data.NewNumber(2),
+			data.NewNumber(3),
+			data.NewNumber(4),
+			data.NewNumber(5),
+			data.NewNumber(6),
+			data.NewNumber(7),
+			data.NewNumber(8),
+			data.NewNumber(9),
+			data.NewNumber(10),
+		),
 	},
 }
