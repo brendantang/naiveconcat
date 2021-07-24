@@ -11,7 +11,8 @@ func TestEval(t *testing.T) {
 		d, s := builtins.StandardDictionary(), c.stack
 		for _, val := range c.vals {
 			Eval(val, d, s)
-			//t.Log("\nDICT", d, "\nSTACK\t", s)
+			//t.Log("\nDICT", d)
+			t.Log("\nSTACK\t", s)
 		}
 		if c.stack.String() != c.wantStack.String() {
 			failEvalTest(t, i, c, c.stack, "")
@@ -192,6 +193,39 @@ var testCases = []testCase{
 		},
 		data.NewStack(
 			data.NewNumber(12),
+		),
+	},
+	{
+		"definitions are local to their enclosing quotation",
+		data.NewStack(
+			data.NewQuotation(
+				data.NewString("outer value"),
+				data.NewString("x"),
+				data.NewWord("define"),
+				data.NewWord("x"),
+				data.NewQuotation(
+					data.NewString("inner value"),
+					data.NewString("x"),
+					data.NewWord("define"),
+					data.NewWord("x"),
+					data.NewQuotation(
+						data.NewString("innermost value"),
+						data.NewString("x"),
+						data.NewWord("define"),
+						data.NewWord("x"),
+					),
+				),
+			),
+		),
+		[]data.Value{
+			data.NewWord("apply"),
+			data.NewWord("apply"),
+			data.NewWord("apply"),
+		},
+		data.NewStack(
+			data.NewString("innermost value"),
+			data.NewString("inner value"),
+			data.NewString("outer value"),
 		),
 	},
 }

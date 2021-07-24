@@ -2,6 +2,8 @@ package parse
 
 import (
 	"github.com/brendantang/naiveconcat/data"
+	"log"
+	"os"
 	"testing"
 )
 
@@ -9,6 +11,7 @@ func TestParser(t *testing.T) {
 	for _, c := range testCases {
 		var in = make(chan token, 1)
 		p := NewParser(in)
+		p.Debug = log.New(os.Stderr, "PARSE:", log.LstdFlags)
 
 		go func() {
 			for _, tok := range c.wantTokens {

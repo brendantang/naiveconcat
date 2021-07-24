@@ -1,0 +1,7 @@
+"foo" say
+
+{"foo" "x" define {"bar" "x" define}}
+apply
+x say
+apply
+x say

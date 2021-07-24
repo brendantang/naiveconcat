@@ -25,7 +25,7 @@ type Lexer struct {
 	behavior lexingFn    // function defining lexing behavior.
 	startPos int         // selection start position.
 	endPos   int         // selection end position.
-	debug    *log.Logger // whether to print out lexer debugging info.
+	Debug    *log.Logger // where to print out lexer Debugging info.
 }
 
 // NewLexer returns a *Lexer with initialized Out, Errs, and Done channels.
@@ -36,7 +36,7 @@ func NewLexer(src string) *Lexer {
 		Done:     make(chan bool, 1),
 		Errs:     make(chan error, 1),
 		behavior: lexMain,
-		debug:    nil,
+		Debug:    nil,
 	}
 }
 
@@ -96,8 +96,8 @@ func lexMain(l *Lexer) lexingFn {
 }
 
 func lexComment(l *Lexer) lexingFn {
-	if l.debug != nil {
-		l.debug.Println("lexing comment")
+	if l.Debug != nil {
+		l.Debug.Println("lexing comment")
 	}
 	l.skipUntil("\n\r")
 	return lexMain
@@ -148,8 +148,8 @@ func (l *Lexer) peek() (r rune, width int) {
 	} else {
 		r, width = l.runeAt(l.endPos)
 	}
-	if l.debug != nil {
-		l.debug.Printf("peek: %s\n", string(r))
+	if l.Debug != nil {
+		l.Debug.Printf("peek: %s\n", string(r))
 	}
 	return
 }
@@ -206,8 +206,8 @@ func (l *Lexer) acceptOne(valid string) bool {
 func (l *Lexer) ignore(width int) {
 	l.endPos += width
 	l.startPos = l.endPos
-	if l.debug != nil {
-		l.debug.Printf("lexing debug: ignore start:%d, end:%d\n", l.startPos, l.endPos)
+	if l.Debug != nil {
+		l.Debug.Printf("lexing Debug: ignore start:%d, end:%d\n", l.startPos, l.endPos)
 	}
 }
 

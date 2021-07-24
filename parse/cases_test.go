@@ -127,4 +127,26 @@ var testCases = []testCase{
 			data.NewString("foo"),
 		},
 	},
+	{
+		"nested quotation",
+		"1 { 2 { 3 } }",
+		[]token{
+			{num, "1"},
+			{openQ, "{"},
+			{num, "2"},
+			{openQ, "{"},
+			{num, "3"},
+			{closeQ, "}"},
+			{closeQ, "}"},
+		},
+		[]data.Value{
+			data.NewNumber(1),
+			data.NewQuotation(
+				data.NewNumber(2),
+				data.NewQuotation(
+					data.NewNumber(3),
+				),
+			),
+		},
+	},
 }

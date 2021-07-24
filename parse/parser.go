@@ -3,13 +3,15 @@ package parse
 import (
 	"fmt"
 	"github.com/brendantang/naiveconcat/data"
+	"log"
 	"strconv"
 )
 
 type Parser struct {
-	in   chan token      // where lexed tokens are received.
-	Out  chan data.Value // where parsed expressions are sent.
-	Errs chan error      // where parsing errors are sent.
+	in    chan token      // where lexed tokens are received.
+	Out   chan data.Value // where parsed expressions are sent.
+	Errs  chan error      // where parsing errors are sent.
+	Debug *log.Logger     // where to print out parser Debugging info.
 }
 
 func NewParser(input chan token) *Parser {
@@ -22,6 +24,10 @@ func NewParser(input chan token) *Parser {
 }
 
 func (p *Parser) Run() {
+	if p.Debug != nil {
+		p.Debug.Println("Started parser", p)
+	}
+loop:
 	for tok := range p.in {
 		switch tok.typ {
 		case num:
@@ -35,13 +41,9 @@ func (p *Parser) Run() {
 		case str:
 			p.Out <- data.NewString(tok.body)
 		case openQ:
-			subIn := make(chan token, 1)
-			subParser := NewParser(subIn)
+			subParser := NewParser(p.in)
+			subParser.Debug = p.Debug
 			go subParser.Run()
-			for subTok, ok := <-p.in; !ok || subTok.typ != closeQ; subTok, ok = <-p.in {
-				subParser.in <- subTok
-			}
-			close(subIn)
 			var quotedVals []data.Value
 			for more := true; more; {
 				select {
@@ -59,9 +61,15 @@ func (p *Parser) Run() {
 				}
 			}
 			p.Out <- data.NewQuotation(quotedVals...)
+		case closeQ:
+			break loop
 		}
 	}
 	close(p.Out)
+	close(p.Errs)
+	if p.Debug != nil {
+		p.Debug.Println("Stopped parser", p)
+	}
 }
 
 func conversionError(tok token, typ data.Type) error {

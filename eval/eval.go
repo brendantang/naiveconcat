@@ -24,8 +24,12 @@ func Eval(val data.Value, d *data.Dictionary, s *data.Stack) error {
 				return data.TypeError(quot, data.Quotation)
 			}
 
+			// create a new dict for bindings local to this
+			// quotation
+			local := data.NewDictionary(d, make(map[string]data.Value))
+
 			for _, val := range quot.Quotation {
-				err := Eval(val, d, s)
+				err := Eval(val, local, s)
 				if err != nil {
 					return err
 				}

@@ -18,7 +18,7 @@ func ExampleInterpret() {
 
 		say	        -- The 'say' word pops the top value off the stack and prints it.
 		`
-	Interpret(src, d, s)
+	Interpret(src, d, s, true)
 	fmt.Println(s)
 
 	// Output:
@@ -34,25 +34,25 @@ func ExampleInterpret_words() {
 		square apply              -- [16]
 		say                       -- []
 		`
-	Interpret(src, d, s)
+	Interpret(src, d, s, true)
 	// Output:
 	// 16
 }
 
-// Let bindings are local to their enclosing quotation(s).
-func ExampleInterpret_let() {
+// "Define" bindings are local to their enclosing quotation(s).
+func ExampleInterpret_locals() {
 	d, s := builtins.StandardDictionary(), data.NewStack()
 
-	src := `3 "x" let
+	src := `3 "x" define
 		x say
 
 		-- x is 2 in the outer quotation, and 1 in the inner.
-		{2 "x" let {1 "x" let x say} x say} apply apply
+		{2 "x" define {1 "x" define x say} x say} apply apply
 
 		x say
 		`
 
-	Interpret(src, d, s)
+	Interpret(src, d, s, true)
 	// Output:
 	// 3
 	// 2

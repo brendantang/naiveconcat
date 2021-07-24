@@ -9,13 +9,18 @@ import (
 	"github.com/brendantang/naiveconcat/data"
 	"github.com/brendantang/naiveconcat/eval"
 	"github.com/brendantang/naiveconcat/parse"
+	"log"
+	"os"
 )
 
 // Interpret takes input, parses it into expressions, and then evaluates those
 // expressions to mutate the dictionary and stack.
-func Interpret(input string, d *data.Dictionary, s *data.Stack) error {
+func Interpret(input string, d *data.Dictionary, s *data.Stack, Debug bool) error {
 	l := parse.NewLexer(input)
 	p := parse.NewParser(l.Out)
+	if Debug {
+		l.Debug, p.Debug = log.New(os.Stderr, "LEX:", log.LstdFlags), log.New(os.Stderr, "PARSE:", log.LstdFlags)
+	}
 	go l.Run()
 	go p.Run()
 	for more := true; more; {
@@ -47,6 +52,7 @@ type Config struct {
 	Input        *bufio.Reader    // provides the source text for the REPL to interpret.
 	InitialDict  *data.Dictionary // initial dictionary when the program starts.
 	InitialStack *data.Stack      // initial stack of data when the program starts.
+	Debug        bool             // when true, print parser and lexer debugging info.
 }
 
 // REPL (read-eval-print-loop) starts an interactive prompt.
@@ -61,13 +67,13 @@ func REPL(cfg Config) error {
 		}
 
 		// interpret the line
-		err = Interpret(input, dict, s)
+		err = Interpret(input, dict, s, cfg.Debug)
 		if err != nil {
 			return err
 		}
 
 		if cfg.Verbose {
-			fmt.Printf("%s\n\n", s)
+			fmt.Println("stack:", s)
 		}
 	}
 	return nil
