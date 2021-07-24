@@ -1,13 +1,17 @@
 package parse
 
 import (
+	"log"
+	"os"
 	"testing"
+	"time"
 )
 
 func TestLexer(t *testing.T) {
 	for _, c := range testCases {
 
 		l := NewLexer(c.src)
+		l.debug = log.New(os.Stderr, "LEX:", log.LstdFlags)
 		go l.Run()
 
 		var got []token
@@ -30,6 +34,12 @@ func TestLexer(t *testing.T) {
 						err,
 					)
 				}
+			case <-time.After(3 * time.Second):
+				t.Fatalf(
+					"FAIL: %s\n%s",
+					c.description,
+					"lexer took too long, maybe it got stuck",
+				)
 			}
 
 		}

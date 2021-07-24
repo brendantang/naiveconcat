@@ -111,4 +111,20 @@ var testCases = []testCase{
 			),
 		},
 	},
+	{
+		"comments",
+		`1 2 -- comment begins
+		--full line comment
+		"foo"`,
+		[]token{
+			{num, "1"},
+			{num, "2"},
+			{str, "foo"},
+		},
+		[]data.Value{
+			data.NewNumber(1),
+			data.NewNumber(2),
+			data.NewString("foo"),
+		},
+	},
 }

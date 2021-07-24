@@ -2,6 +2,7 @@ package parse
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -21,9 +22,10 @@ type Lexer struct {
 	Out      chan token // where lexed tokens are sent.
 	Errs     chan error // where lexing errors are sent.
 	Done     chan bool
-	behavior lexingFn // function defining lexing behavior.
-	startPos int      // selection start position.
-	endPos   int      // selection end position.
+	behavior lexingFn    // function defining lexing behavior.
+	startPos int         // selection start position.
+	endPos   int         // selection end position.
+	debug    *log.Logger // whether to print out lexer debugging info.
 }
 
 // NewLexer returns a *Lexer with initialized Out, Errs, and Done channels.
@@ -34,6 +36,7 @@ func NewLexer(src string) *Lexer {
 		Done:     make(chan bool, 1),
 		Errs:     make(chan error, 1),
 		behavior: lexMain,
+		debug:    nil,
 	}
 }
 
@@ -56,7 +59,10 @@ func lexMain(l *Lexer) lexingFn {
 	for r, width := l.peek(); r != EOF; r, width = l.peek() {
 		switch {
 		case r == '-' || r == '.': // either could be a word or the beginning of a number.
-			if nextR, _ := l.runeAt(l.endPos + width); !unicode.IsDigit(nextR) {
+			switch nextR, _ := l.runeAt(l.endPos + width); {
+			case nextR == '-': // '--' indicates a comment
+				return lexComment
+			case !unicode.IsDigit(nextR):
 				return lexWord
 			}
 			fallthrough
@@ -87,6 +93,14 @@ func lexMain(l *Lexer) lexingFn {
 		}
 	}
 	return nil
+}
+
+func lexComment(l *Lexer) lexingFn {
+	if l.debug != nil {
+		l.debug.Println("lexing comment")
+	}
+	l.skipUntil("\n\r")
+	return lexMain
 }
 
 func lexNumber(l *Lexer) lexingFn {
@@ -129,9 +143,15 @@ func lexString(l *Lexer) lexingFn {
 // peek returns the next rune without adding it to the selection.
 func (l *Lexer) peek() (r rune, width int) {
 	if l.endPos >= len(l.src) {
-		return EOF, 0
+		r = EOF
+		width = 0
+	} else {
+		r, width = l.runeAt(l.endPos)
 	}
-	return l.runeAt(l.endPos)
+	if l.debug != nil {
+		l.debug.Printf("peek: %s\n", string(r))
+	}
+	return
 }
 
 // next returns the next rune and includes it in the selection.
@@ -186,6 +206,15 @@ func (l *Lexer) acceptOne(valid string) bool {
 func (l *Lexer) ignore(width int) {
 	l.endPos += width
 	l.startPos = l.endPos
+	if l.debug != nil {
+		l.debug.Printf("lexing debug: ignore start:%d, end:%d\n", l.startPos, l.endPos)
+	}
+}
+
+func (l *Lexer) skipUntil(want string) {
+	for r, width := l.peek(); !(strings.IndexRune(want, r) >= 0); r, width = l.peek() {
+		l.ignore(width)
+	}
 }
 
 func isWhitespace(r rune) bool {

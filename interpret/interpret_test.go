@@ -1,23 +1,11 @@
 package interpret
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/brendantang/naiveconcat/builtins"
 	"github.com/brendantang/naiveconcat/data"
-	"strings"
 	_ "testing"
 )
-
-func testingConfig(src string) Config {
-	return Config{
-		Prompt:       "",
-		DebugMode:    true,
-		Input:        bufio.NewReader(strings.NewReader(src)),
-		InitialDict:  builtins.StandardDictionary(),
-		InitialStack: data.NewStack(),
-	}
-}
 
 func ExampleInterpret() {
 	d, s := builtins.StandardDictionary(), data.NewStack()
@@ -35,9 +23,9 @@ func ExampleInterpret() {
 
 	// Output:
 	// 84
-	// bar
-	// ["foo" 2]
+	// ["foo" 2 "bar"]
 }
+
 func ExampleInterpret_words() {
 	d, s := builtins.StandardDictionary(), data.NewStack()
 
