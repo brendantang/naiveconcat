@@ -19,6 +19,9 @@ Status:
   
   > { 2 "x" define x { 1 "x" define x } } apply apply -- redefine x in nested quotations
   [2 1]
+  
+  > x  -- global definition remains
+  [2 1 3]
   ```
 
 
