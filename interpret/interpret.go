@@ -73,7 +73,7 @@ func REPL(cfg Config) error {
 		}
 
 		if cfg.Verbose {
-			fmt.Println("stack:", s)
+			fmt.Printf("%s\n\n", s)
 		}
 	}
 	return nil

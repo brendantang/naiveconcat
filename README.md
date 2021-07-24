@@ -5,10 +5,23 @@ It doesn't do much yet (see below), but if you want to try it you can download a
 
 TODOs:
 - [x] comments with `--`
-- [ ] `let` binds word definitions in the scope of a surrounding quotation
+- [x] `define` binds word definitions in the scope of a surrounding quotation
 - [ ] flow control with `if`
 
 Status:
+- 2021-07-24 - Quotations are closures—words you define inside a quotation are local to that quotation. Comment out to end of line with `--`.
+  ```
+  > 3 "x" define
+  []
+  
+  > x  -- global definition for x is 3.
+  [3]
+  
+  > { 2 "x" define x { 1 "x" define x } } apply apply -- redefine x in nested quotations
+  [2 1]
+  ```
+
+
 - 2021-07-20 - Quote values, define words.
   ```
   > {2 2 +}
