@@ -8,14 +8,21 @@ TODOs:
 - [x] `define` binds word definitions in the scope of a surrounding quotation
 - [x] flow control with `then`
 - [ ] should `apply` be implicit? separate out `define` and `let`?
-- [ ] import definitions from files
+- [x] import definitions from files
 - [ ] "standard library" — iteration especially
 - [ ] tail call optimization would be nice, no idea how difficult to build
 
 Status:
-- 2021-07-24 - Quotations are closures—words you define inside a quotation are local to that quotation. Comment out to end of line with `--`.
+- 2021-07-24 - Quotations are closures—words you define inside a quotation are local to that quotation. Comment out to end of line with `--`. Import statements at the beginning of a file.
   ```
-  > 3 "x" define
+  import (
+    prelude.naiveconcat
+  )
+  
+  > {3} {200} true if apply -- "if" is imported from prelude
+  [3]
+  
+  > "x" define
   []
   
   > x  -- global definition for x is 3.
