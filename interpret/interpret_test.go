@@ -89,7 +89,7 @@ var interpretTestCases = []struct {
 		"5\n4\n3\n2\n1\n0",
 	},
 	{
-		"fibonacci",
+		"fibonacci", // Not tail-recursive, will run out of memory with higher numbers
 		`
 		{ 
 			"x" define
@@ -100,5 +100,26 @@ var interpretTestCases = []struct {
 		10 fib apply say
 		`,
 		"55",
+	},
+	{
+		"fibonacci tail-recursive",
+		`
+		{
+			{
+				"a" define
+				"b" define
+				"n" define
+				{a} 0 n = then
+				{b} 1 n = then 
+				{ n 1 -  a b +  b  fib-tail apply}  
+					0 n =  1 n =  or not then apply
+			} "fib-tail" define
+
+			1 0 fib-tail apply
+
+		} "fib" define
+		75 fib apply say 
+		`,
+		"2111485077978050",
 	},
 }
