@@ -313,4 +313,52 @@ var testCases = []testCase{
 			data.NewNumber(10),
 		),
 	},
+	{
+		"fibonacci",
+		data.NewStack(
+			/*
+				{
+					"x" define
+					{0} 0 x = then
+					{1} 1 x = then
+					{x 1 - fib apply x 2 - fib apply +} 0 x = 1 x = or not then apply
+				} "fib" define
+				4 fib apply
+			*/
+			data.NewQuotation(
+				data.NewString("x"), data.NewWord("define"),
+				data.NewQuotation(data.NewNumber(0)), data.NewNumber(0), data.NewWord("x"), data.NewWord("="), data.NewWord("then"),
+				data.NewQuotation(data.NewNumber(1)), data.NewNumber(1), data.NewWord("x"), data.NewWord("="), data.NewWord("then"),
+
+				data.NewQuotation(
+					data.NewWord("x"),
+					data.NewNumber(1),
+					data.NewWord("-"),
+					data.NewWord("fib"),
+					data.NewWord("apply"),
+					data.NewWord("x"),
+					data.NewNumber(2),
+					data.NewWord("-"),
+					data.NewWord("fib"),
+					data.NewWord("apply"),
+					data.NewWord("+"),
+				),
+				data.NewNumber(0), data.NewWord("x"), data.NewWord("="),
+				data.NewNumber(1), data.NewWord("x"), data.NewWord("="),
+				data.NewWord("or"),
+				data.NewWord("not"),
+				data.NewWord("then"),
+				data.NewWord("apply"),
+			),
+		),
+		[]data.Value{
+			data.NewString("fib"), data.NewWord("define"),
+			data.NewNumber(10),
+			data.NewWord("fib"),
+			data.NewWord("apply"),
+		},
+		data.NewStack(
+			data.NewNumber(55),
+		),
+	},
 }

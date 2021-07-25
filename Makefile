@@ -4,5 +4,3 @@ test:
 doc:
 	godoc -http=:3000
 
-example:
-	go run . -verbose example.txt

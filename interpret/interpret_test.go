@@ -33,7 +33,7 @@ func TestInterpret(t *testing.T) {
 		}
 		got := strings.Trim(string(output), "\n\r \t")
 		if got != c.want {
-			t.Fatalf("FAIL: %s\nwant: %#v\ngot: %#v\n", c.description, c.want, got)
+			t.Fatalf("FAIL: %s\nwant: %s\ngot: %s\n", c.description, c.want, got)
 		}
 
 		// set stdout back to normal
@@ -86,6 +86,19 @@ var interpretTestCases = []struct {
 
 		5 countdown apply
 		`,
-		`5 4 3 2 1`,
+		"5\n4\n3\n2\n1\n0",
+	},
+	{
+		"fibonacci",
+		`
+		{ 
+			"x" define
+			{0} 0 x = then
+			{1} 1 x = then
+			{x 1 - fib apply x 2 - fib apply +} 0 x = 1 x = or not then apply
+		} "fib" define
+		10 fib apply say
+		`,
+		"55",
 	},
 }

@@ -11,7 +11,6 @@ func Eval(val data.Value, d *data.Dictionary, s *data.Stack) error {
 
 	//fmt.Printf("depth:%d, stack: %-*s \n", d.Depth(), d.Depth(), s)
 	//fmt.Printf("depth:%d, val: %-*s \n", d.Depth(), d.Depth(), val)
-	//fmt.Printf("%    *s\n", d.Depth(), val)
 
 	switch val.Type {
 	case data.Number, data.String, data.Quotation, data.Boolean:

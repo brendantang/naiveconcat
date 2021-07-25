@@ -9,11 +9,11 @@ import (
 )
 
 const (
-	wordRunes            = "abcdefghijjklmnopqrstuvwxyz+-*/" // wordRunes are legal characters in a word name.
-	stringDelimiter rune = '"'                               // delimiter that opens or closes a string.
-	stringEscaper   rune = '\\'                              // delimiter that escapes the following character in a string.
-	quotationOpener rune = '{'                               // delimiter that opens a quotation.
-	quotationCloser rune = '}'                               // delimiter that closes a quotation.
+	wordRunes            = "abcdefghijjklmnopqrstuvwxyz+-*/=" // wordRunes are legal characters in a word name.
+	stringDelimiter rune = '"'                                // delimiter that opens or closes a string.
+	stringEscaper   rune = '\\'                               // delimiter that escapes the following character in a string.
+	quotationOpener rune = '{'                                // delimiter that opens a quotation.
+	quotationCloser rune = '}'                                // delimiter that closes a quotation.
 )
 
 // Lexer scans an input src and emits a stream of lexed tokens.

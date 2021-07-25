@@ -149,4 +149,44 @@ var testCases = []testCase{
 			),
 		},
 	},
+	{
+		"definition",
+		`{
+			"x" define
+			x 0 = "done" define
+			{ x } done then
+			{ x x 1 - countdown apply } done not then apply
+		} "countdown" define
+
+		5 countdown apply
+		`,
+		[]token{
+			{openQ, "{"},
+			{str, "x"}, {word, "define"},
+			{word, "x"}, {num, "0"}, {word, "="}, {str, "done"}, {word, "define"},
+			{openQ, "{"}, {word, "x"}, {closeQ, "}"}, {word, "done"}, {word, "then"},
+			{openQ, "{"}, {word, "x"}, {word, "x"}, {num, "1"}, {word, "-"}, {word, "countdown"}, {word, "apply"}, {closeQ, "}"},
+			{word, "done"}, {word, "not"}, {word, "then"}, {word, "apply"},
+			{closeQ, "}"}, {str, "countdown"}, {word, "define"},
+
+			{num, "5"}, {word, "countdown"}, {word, "apply"},
+		},
+		[]data.Value{
+			data.NewQuotation(
+				data.NewString("x"), data.NewWord("define"),
+				data.NewWord("x"), data.NewNumber(0), data.NewWord("="), data.NewString("done"), data.NewWord("define"),
+				data.NewQuotation(data.NewWord("x")), data.NewWord("done"), data.NewWord("then"),
+				data.NewQuotation(
+					data.NewWord("x"), // Push on the stack
+					data.NewWord("x"), data.NewNumber(1), data.NewWord("-"), data.NewWord("countdown"), data.NewWord("apply"),
+				),
+				data.NewWord("done"), data.NewWord("not"), data.NewWord("then"), data.NewWord("apply"),
+			),
+			data.NewString("countdown"),
+			data.NewWord("define"),
+			data.NewNumber(5),
+			data.NewWord("countdown"),
+			data.NewWord("apply"),
+		},
+	},
 }

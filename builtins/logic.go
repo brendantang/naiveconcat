@@ -15,6 +15,7 @@ func not(d *data.Dictionary, s *data.Stack) error {
 	s.Push(data.NewBoolean(!b.Bool))
 	return nil
 }
+
 func or(d *data.Dictionary, s *data.Stack) error {
 
 	a, err := s.Pop()
