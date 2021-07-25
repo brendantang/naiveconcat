@@ -1,7 +1,7 @@
 -- FLOW CONTROL
 
 -- if
--- `"consequent" "alternative" false if`
+-- `{"consequent" say} {"alternative" say} false if apply`
 -- => "alternative"
 {
   "predicate" define 
