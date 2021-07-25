@@ -122,4 +122,19 @@ var interpretTestCases = []struct {
 		`,
 		"2111485077978050",
 	},
+	{
+		"implement `each` using `then`",
+		`
+		{ -- Not tail recursive, could have bad performance
+			"f" define
+			length "l" define
+			{ 
+				lop f apply 
+				{f each}  length 0 = not  then apply
+			} l 0 = not then apply
+		} "each" define
+		{1 2 3} {say} each
+		`,
+		"1\n2\n3\n",
+	},
 }

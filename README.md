@@ -7,7 +7,10 @@ TODOs:
 - [x] comments with `--`
 - [x] `define` binds word definitions in the scope of a surrounding quotation
 - [x] flow control with `then`
-- [ ] iteration
+- [ ] should `apply` be implicit? separate out `define` and `let`?
+- [ ] import definitions from files
+- [ ] "standard library" — iteration especially
+- [ ] tail call optimization would be nice, no idea how difficult to build
 
 Status:
 - 2021-07-24 - Quotations are closures—words you define inside a quotation are local to that quotation. Comment out to end of line with `--`.
