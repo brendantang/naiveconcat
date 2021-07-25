@@ -13,3 +13,8 @@ func say(d *data.Dictionary, s *data.Stack) error {
 	fmt.Println(val)
 	return nil
 }
+
+func showStack(d *data.Dictionary, s *data.Stack) error {
+	fmt.Println(s)
+	return nil
+}

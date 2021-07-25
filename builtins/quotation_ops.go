@@ -4,9 +4,10 @@ import (
 	"github.com/brendantang/naiveconcat/data"
 )
 
-// length returns the length of the quotation on top of the stack.
+// length returns the length of the quotation on top of the stack without
+// popping it.
 func length(d *data.Dictionary, s *data.Stack) error {
-	quot, err := s.Pop()
+	quot, err := s.Peek()
 	if err != nil {
 		return err
 	}

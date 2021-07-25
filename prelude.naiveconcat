@@ -1,0 +1,14 @@
+-- FLOW CONTROL
+
+-- if
+-- `"consequent" "alternative" false if`
+-- => "alternative"
+{
+  "predicate" define 
+  "alternative" define
+  "consequent" define
+  consequent predicate then
+  alternative predicate not then
+  apply
+} "if" define
+

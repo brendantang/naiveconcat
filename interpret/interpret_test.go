@@ -125,16 +125,27 @@ var interpretTestCases = []struct {
 	{
 		"implement `each` using `then`",
 		`
-		{ -- Not tail recursive, could have bad performance
-			"f" define
-			length "l" define
-			{ 
-				lop f apply 
-				{f each}  length 0 = not  then apply
-			} l 0 = not then apply
-		} "each" define
-		{1 2 3} {say} each
+			{ -- Not tail recursive, could have bad performance
+				"f" define
+				length "l" define
+				{
+					lop 
+					f apply
+					{f each apply}  length 0 = not  then apply
+				} l 0 = not then apply
+			} "each" define
+			{1 2 3} {say} each apply
+			`,
+		"1\n2\n3",
+	},
+	{
+		"import source from a file",
+		`
+		import (
+			example-import.naiveconcat
+		)
+		imported-from-example say
 		`,
-		"1\n2\n3\n",
+		`"Hello from imported file"`,
 	},
 }

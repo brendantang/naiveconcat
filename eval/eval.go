@@ -44,28 +44,30 @@ func Eval(val data.Value, d *data.Dictionary, s *data.Stack) error {
 				}
 			}
 			return nil
-		case "each": // "each" keyword iterates over the items in a quotation
-			iter, err := s.Pop()
-			if err != nil {
-				return err
-			}
-			if iter.Type != data.Quotation {
-				return data.TypeError(iter, data.Quotation)
-			}
-			items, err := s.Pop()
-			if err != nil {
-				return err
-			}
-			if items.Type != data.Quotation {
-				return data.TypeError(items, data.Quotation)
-			}
-			for _, item := range items.Quotation {
-				s.Push(item)
-				err := apply(iter, d, s)
-				if err != nil {
-					return err
-				}
-			}
+			/*
+				case "each": // "each" keyword iterates over the items in a quotation
+					iter, err := s.Pop()
+					if err != nil {
+						return err
+					}
+					if iter.Type != data.Quotation {
+						return data.TypeError(iter, data.Quotation)
+					}
+					items, err := s.Pop()
+					if err != nil {
+						return err
+					}
+					if items.Type != data.Quotation {
+						return data.TypeError(items, data.Quotation)
+					}
+					for _, item := range items.Quotation {
+						s.Push(item)
+						err := apply(iter, d, s)
+						if err != nil {
+							return err
+						}
+					}
+			*/
 		default: // look up a word in the dictionary
 			definition, ok := d.Get(val.Word)
 			if !ok {

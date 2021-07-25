@@ -9,16 +9,33 @@ import (
 	"github.com/brendantang/naiveconcat/data"
 	"github.com/brendantang/naiveconcat/eval"
 	"github.com/brendantang/naiveconcat/parse"
+	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 )
 
 // Interpret takes input, parses it into expressions, and then evaluates those
 // expressions to mutate the dictionary and stack.
-func Interpret(input string, d *data.Dictionary, s *data.Stack, Debug bool) error {
+func Interpret(input string, d *data.Dictionary, s *data.Stack, debug bool) error {
+	if strings.HasPrefix(strings.TrimLeft(input, "\t\n\r "), "import (") {
+		split := strings.SplitN(input, ")", 2)
+		imports := strings.Fields(split[0])[2:] // drop the "import ("
+		for _, path := range imports {
+			file, err := ioutil.ReadFile(path)
+			if err != nil {
+				return importErr(path, err)
+			}
+			err = Interpret(string(file), d, s, debug)
+			if err != nil {
+				return importErr(path, err)
+			}
+		}
+		input = split[1]
+	}
 	l := parse.NewLexer(input)
 	p := parse.NewParser(l.Out)
-	if Debug {
+	if debug {
 		l.Debug, p.Debug = log.New(os.Stderr, "LEX:", log.LstdFlags), log.New(os.Stderr, "PARSE:", log.LstdFlags)
 	}
 	go l.Run()
@@ -77,4 +94,8 @@ func REPL(cfg Config) error {
 		}
 	}
 	return nil
+}
+
+func importErr(path string, err error) error {
+	return fmt.Errorf("error loading import '%s': %v", path, err)
 }

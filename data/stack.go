@@ -32,6 +32,14 @@ func (s *Stack) Pop() (Value, error) {
 	return d, nil
 }
 
+// Peek returns the top item from the Stack without consuming it.
+func (s *Stack) Peek() (Value, error) {
+	if len(s.data) < 1 {
+		return Value{}, errors.New(emptyStackError)
+	}
+	return s.data[0], nil
+}
+
 func (s *Stack) String() string {
 	var strs []string
 	for _, val := range s.data {
