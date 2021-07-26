@@ -3,15 +3,13 @@ package parse
 import (
 	"fmt"
 	"github.com/brendantang/naiveconcat/data"
-	"log"
 	"strconv"
 )
 
 type Parser struct {
-	in    chan token      // where lexed tokens are received.
-	Out   chan data.Value // where parsed expressions are sent.
-	Errs  chan error      // where parsing errors are sent.
-	Debug *log.Logger     // where to print out parser Debugging info.
+	in   chan token      // where lexed tokens are received.
+	Out  chan data.Value // where parsed expressions are sent.
+	Errs chan error      // where parsing errors are sent.
 }
 
 func NewParser(input chan token) *Parser {
@@ -24,9 +22,6 @@ func NewParser(input chan token) *Parser {
 }
 
 func (p *Parser) Run() {
-	if p.Debug != nil {
-		p.Debug.Println("Started parser", p)
-	}
 loop:
 	for tok := range p.in {
 		switch tok.typ {
@@ -42,7 +37,6 @@ loop:
 			p.Out <- data.NewString(tok.body)
 		case openQ:
 			subParser := NewParser(p.in)
-			subParser.Debug = p.Debug
 			go subParser.Run()
 			var quotedVals []data.Value
 			for more := true; more; {
@@ -67,9 +61,6 @@ loop:
 	}
 	close(p.Out)
 	close(p.Errs)
-	if p.Debug != nil {
-		p.Debug.Println("Stopped parser", p)
-	}
 }
 
 func conversionError(tok token, typ data.Type) error {

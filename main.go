@@ -15,7 +15,6 @@ import (
 
 func main() {
 	verbose := flag.Bool("verbose", false, "Print out the stack at each REPL loop")
-	debug := flag.Bool("debug", false, "Print out parser and lexer debug info")
 	flag.Parse()
 	cfg := interpret.Config{
 		Prompt:       "> ",
@@ -23,7 +22,6 @@ func main() {
 		Input:        bufio.NewReader(os.Stdin),
 		InitialDict:  builtins.Dict(),
 		InitialStack: data.NewStack(),
-		Debug:        *debug,
 	}
 	filepath := flag.Arg(0)
 	if filepath != "" {
@@ -31,7 +29,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		err = interpret.Interpret(string(content), builtins.Dict(), data.NewStack(), *debug)
+		err = interpret.Interpret(string(content), builtins.Dict(), data.NewStack())
 		if err != nil {
 			log.Fatal(err)
 		}

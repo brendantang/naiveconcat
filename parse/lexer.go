@@ -2,7 +2,6 @@ package parse
 
 import (
 	"fmt"
-	"log"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -21,38 +20,31 @@ type Lexer struct {
 	src      string     // source text to lex.
 	Out      chan token // where lexed tokens are sent.
 	Errs     chan error // where lexing errors are sent.
-	Done     chan bool
-	behavior lexingFn    // function defining lexing behavior.
-	startPos int         // selection start position.
-	endPos   int         // selection end position.
-	Debug    *log.Logger // where to print out lexer Debugging info.
+	behavior lexingFn   // function defining lexing behavior.
+	startPos int        // selection start position.
+	endPos   int        // selection end position.
 }
 
-// NewLexer returns a *Lexer with initialized Out, Errs, and Done channels.
+// NewLexer returns a *Lexer with initialized Out and Errs channels.
 func NewLexer(src string) *Lexer {
 	return &Lexer{
 		src:      src,
 		Out:      make(chan token, 1),
-		Done:     make(chan bool, 1),
 		Errs:     make(chan error, 1),
 		behavior: lexMain,
-		Debug:    nil,
 	}
 }
 
 type lexingFn func(l *Lexer) lexingFn
 
 // Run scans the source text and emits tokens on the Out channel. When an error
-// is encountered, it is sent on the Errs channel. When lexing is finished,
-// true is sent on the Done channel.
+// is encountered, it is sent on the Errs channel.
 func (l *Lexer) Run() {
 	for l.behavior != nil {
 		l.behavior = l.behavior(l)
 	}
 	close(l.Out)
 	close(l.Errs)
-	l.Done <- true
-	close(l.Done)
 }
 
 func lexMain(l *Lexer) lexingFn {
@@ -96,9 +88,6 @@ func lexMain(l *Lexer) lexingFn {
 }
 
 func lexComment(l *Lexer) lexingFn {
-	if l.Debug != nil {
-		l.Debug.Println("lexing comment")
-	}
 	l.skipUntil("\n\r")
 	return lexMain
 }
@@ -147,9 +136,6 @@ func (l *Lexer) peek() (r rune, width int) {
 		width = 0
 	} else {
 		r, width = l.runeAt(l.endPos)
-	}
-	if l.Debug != nil {
-		l.Debug.Printf("peek: %s\n", string(r))
 	}
 	return
 }
@@ -206,9 +192,6 @@ func (l *Lexer) acceptOne(valid string) bool {
 func (l *Lexer) ignore(width int) {
 	l.endPos += width
 	l.startPos = l.endPos
-	if l.Debug != nil {
-		l.Debug.Printf("lexing Debug: ignore start:%d, end:%d\n", l.startPos, l.endPos)
-	}
 }
 
 func (l *Lexer) skipUntil(want string) {

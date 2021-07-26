@@ -13,3 +13,7 @@
   apply
 } "if" define
 
+
+{
+  
+} "cond" define

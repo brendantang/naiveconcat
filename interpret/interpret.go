@@ -10,14 +10,12 @@ import (
 	"github.com/brendantang/naiveconcat/eval"
 	"github.com/brendantang/naiveconcat/parse"
 	"io/ioutil"
-	"log"
-	"os"
 	"strings"
 )
 
 // Interpret takes input, parses it into expressions, and then evaluates those
 // expressions to mutate the dictionary and stack.
-func Interpret(input string, d *data.Dictionary, s *data.Stack, debug bool) error {
+func Interpret(input string, d *data.Dictionary, s *data.Stack) error {
 	if strings.HasPrefix(strings.TrimLeft(input, "\t\n\r "), "import (") {
 		split := strings.SplitN(input, ")", 2)
 		imports := strings.Fields(split[0])[2:] // drop the "import ("
@@ -26,7 +24,7 @@ func Interpret(input string, d *data.Dictionary, s *data.Stack, debug bool) erro
 			if err != nil {
 				return importErr(path, err)
 			}
-			err = Interpret(string(file), d, s, debug)
+			err = Interpret(string(file), d, s)
 			if err != nil {
 				return importErr(path, err)
 			}
@@ -35,9 +33,6 @@ func Interpret(input string, d *data.Dictionary, s *data.Stack, debug bool) erro
 	}
 	l := parse.NewLexer(input)
 	p := parse.NewParser(l.Out)
-	if debug {
-		l.Debug, p.Debug = log.New(os.Stderr, "LEX:", log.LstdFlags), log.New(os.Stderr, "PARSE:", log.LstdFlags)
-	}
 	go l.Run()
 	go p.Run()
 	for more := true; more; {
@@ -69,7 +64,6 @@ type Config struct {
 	Input        *bufio.Reader    // provides the source text for the REPL to interpret.
 	InitialDict  *data.Dictionary // initial dictionary when the program starts.
 	InitialStack *data.Stack      // initial stack of data when the program starts.
-	Debug        bool             // when true, print parser and lexer debugging info.
 }
 
 // REPL (read-eval-print-loop) starts an interactive prompt.
@@ -84,7 +78,7 @@ func REPL(cfg Config) error {
 		}
 
 		// interpret the line
-		err = Interpret(input, dict, s, cfg.Debug)
+		err = Interpret(input, dict, s)
 		if err != nil {
 			return err
 		}

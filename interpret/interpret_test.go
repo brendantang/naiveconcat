@@ -23,7 +23,7 @@ func TestInterpret(t *testing.T) {
 
 		// interpret the test case
 		d, s := builtins.Dict(), data.NewStack()
-		err = Interpret(c.src, d, s, false)
+		err = Interpret(c.src, d, s)
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -17,7 +17,7 @@ func ExampleInterpret() {
 
 		say	        -- The 'say' word pops the top value off the stack and prints it.
 		`
-	err := Interpret(src, d, s, false)
+	err := Interpret(src, d, s)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -36,7 +36,7 @@ func ExampleInterpret_words() {
 		square apply              -- [16]
 		say                       -- []
 		`
-	err := Interpret(src, d, s, false)
+	err := Interpret(src, d, s)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -57,7 +57,7 @@ func ExampleInterpret_locals() {
 		x say
 		`
 
-	err := Interpret(src, d, s, false)
+	err := Interpret(src, d, s)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -77,7 +77,7 @@ func ExampleInterpret_conditions() {
 		say
 		`
 
-	err := Interpret(src, d, s, false)
+	err := Interpret(src, d, s)
 	if err != nil {
 		fmt.Println(err)
 	}
