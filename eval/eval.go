@@ -41,7 +41,21 @@ func Eval(val data.Value, d *data.Dictionary, s *data.Stack) error {
 				}
 			}
 			return nil
-		case "define": // handle special `define` keyword
+		case "lambda": // keyword `lambda` pops the top value and pushes a proc that, when evaluated, applies that value.
+			head, err := s.Pop()
+			if err != nil {
+				return err
+			}
+			proc := data.NewProc(
+				func(d *data.Dictionary, s *data.Stack) error {
+					return apply(head, d, s)
+				},
+			)
+			s.Push(proc)
+			return nil
+		case "define":
+			// keyword `define` pops a string and the next value, then saves
+			// a word named for that string which evaluates to a procedure that applies that value.
 			wordName, err := s.Pop()
 			if err != nil {
 				return err
@@ -52,9 +66,6 @@ func Eval(val data.Value, d *data.Dictionary, s *data.Stack) error {
 			definition, err := s.Pop()
 			if err != nil {
 				return err
-			}
-			if definition.Type != data.Quotation {
-				return data.TypeError(definition, data.Quotation)
 			}
 			proc := data.NewProc(
 				func(d *data.Dictionary, s *data.Stack) error {
