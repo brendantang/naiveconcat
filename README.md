@@ -21,7 +21,7 @@ There is a **stack**, which is a first-in-last-out pile of values. Values like n
 [1 2 3 "foo" 100]
 ```
 
-A **procedure** is a value that manipulates the stack and the dictionary, and may perform side effects like printing output.
+A **procedure** is a value that manipulates the stack (and the dictionary), and may perform side effects like printing output.
 Here are examples of procedures for addition, multiplication, and printing output.
 
 ```
@@ -39,7 +39,7 @@ Here are examples of procedures for addition, multiplication, and printing outpu
 []
 ```
 
-There is also a **dictionary**, which binds words to definitions. A **word** is a value that defines another value. To evaluate a word, substitute it for its definition and evaluate that.
+The **dictionary** binds words to definitions. A **word** is a value that defines another value. To evaluate a word, substitute it for its definition and evaluate that.
 
 ```
 > 100 "a-cool-number" 
