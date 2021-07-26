@@ -96,7 +96,7 @@ Words like `+`, `*`, and `say` are defined by primitive procedures built into th
 [2]
 ```
 
-Making a procedure and then saving it as a word definition is pretty common, so there is a keyword for it: `define`.
+Making a procedure and then saving it as a word definition is pretty important, so there is a keyword for it: `define`.
 
 ```
 > {2 *} "double" define
