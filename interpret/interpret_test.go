@@ -16,24 +16,24 @@ func TestInterpret(t *testing.T) {
 		normalStdout := os.Stdout
 		tmp, err := ioutil.TempFile("", "captured_output")
 		if err != nil {
-			t.Fatal(err)
+			failInterpretTest(t, c, "error opening temporary file", err.Error())
 		}
-		defer os.Remove(tmp.Name())
+		defer os.Remove(tmp.Name()) // defer cleanup
 		os.Stdout = tmp
 
 		// interpret the test case
 		d, s := builtins.Dict(), data.NewStack()
 		err = Interpret(c.src, d, s)
 		if err != nil {
-			t.Fatal(err)
+			failInterpretTest(t, c, "interpreter error", err.Error())
 		}
 		output, err := ioutil.ReadFile(tmp.Name())
 		if err != nil {
-			t.Fatal(err)
+			failInterpretTest(t, c, "error reading captured output", err.Error())
 		}
 		got := strings.Trim(string(output), "\n\r \t")
 		if got != c.want {
-			t.Fatalf("FAIL: %s\nwant: %s\ngot: %s\n", c.description, c.want, got)
+			failInterpretTest(t, c, got, "")
 		}
 
 		// set stdout back to normal
@@ -41,11 +41,17 @@ func TestInterpret(t *testing.T) {
 	}
 }
 
-var interpretTestCases = []struct {
+func failInterpretTest(t *testing.T, c interpretTestCase, got string, msg string) {
+	t.Fatalf("FAIL: %s\nWant: %s\nGot: %s\n%s\n\n", c.description, c.want, got, msg)
+}
+
+type interpretTestCase struct {
 	description string
 	src         string
 	want        string
-}{
+}
+
+var interpretTestCases = []interpretTestCase{
 	{
 		"some values",
 		`-- From '--' to the end of a line is a comment.
@@ -63,28 +69,28 @@ var interpretTestCases = []struct {
 		"use `then` to implement `if` with consequent and alternative",
 		`
 		{ 
-		  "predicate" define 
-		  "alternative" define
-		  "consequent" define
+		  "predicate" let 
+		  "alternative" let
+		  "consequent" let
 		  consequent predicate then
 		  alternative predicate not then
 		  apply
 		} "if" define
 
-		{"consequent" say} {"alternative" say} false if apply`,
+		{"consequent" say} {"alternative" say} false if`,
 		`"alternative"`,
 	},
 	{
 		"use `then` to implement a recursive function",
 		`
 		{
-			"x" define
-			x 0 = "done" define
+			"x" let
+			x 0 = "done" let
 			{ x say } done then
-			{ x say x 1 - countdown apply } done not then apply
+			{ x say x 1 - countdown } done not then apply
 		} "countdown" define
 
-		5 countdown apply
+		5 countdown
 		`,
 		"5\n4\n3\n2\n1\n0",
 	},
@@ -92,12 +98,12 @@ var interpretTestCases = []struct {
 		"fibonacci", // Not tail-recursive, will run out of memory with higher numbers
 		`
 		{ 
-			"x" define
+			"x" let
 			{0} 0 x = then
 			{1} 1 x = then
-			{x 1 - fib apply x 2 - fib apply +} 0 x = 1 x = or not then apply
+			{x 1 - fib x 2 - fib +} 0 x = 1 x = or not then apply
 		} "fib" define
-		10 fib apply say
+		10 fib say
 		`,
 		"55",
 	},
@@ -106,19 +112,19 @@ var interpretTestCases = []struct {
 		`
 		{
 			{
-				"a" define
-				"b" define
-				"n" define
+				"a" let
+				"b" let
+				"n" let
 				{a} 0 n = then
 				{b} 1 n = then 
-				{ n 1 -  a b +  b  fib-tail apply}  
+				{ n 1 -  a b +  b  fib-tail}  
 					0 n =  1 n =  or not then apply
 			} "fib-tail" define
 
-			1 0 fib-tail apply
+			1 0 fib-tail
 
 		} "fib" define
-		75 fib apply say 
+		75 fib say 
 		`,
 		"2111485077978050",
 	},
@@ -126,15 +132,15 @@ var interpretTestCases = []struct {
 		"implement `each` using `then`",
 		`
 			{ -- Not tail recursive, could have bad performance
-				"f" define
-				length "l" define
+				"f" let
+				length "l" let
 				{
 					lop 
 					f apply
-					{f each apply}  length 0 = not  then apply
+					{f each}  length 0 = not  then apply
 				} l 0 = not then apply
 			} "each" define
-			{1 2 3} {say} each apply
+			{1 2 3} {say} each 
 			`,
 		"1\n2\n3",
 	},

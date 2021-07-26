@@ -5,9 +5,9 @@
 -- `{"consequent" say} {"alternative" say} false if apply`
 -- => "alternative"
 {
-  "predicate" define 
-  "alternative" define
-  "consequent" define
+  "predicate" let 
+  "alternative" let
+  "consequent" let
   consequent predicate then
   alternative predicate not then
   apply
@@ -15,19 +15,19 @@
 
 -- each
 { -- Not tail recursive, could have bad performance
-	"f" define
-	length "l" define
+	"f" let
+	length "l" let
 	{
 		lop 
 		f apply
-		{f each apply}  length 0 = not  then apply
+		{f each}  length 0 = not  then apply
 	} l 0 = not then apply
 } "each" define
 
 -- STACK MANIPULATION
 
 {
-  "a" define
-  "b" define
+  "a" let
+  "b" let
   a b
 } "swap" define

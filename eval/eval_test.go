@@ -10,9 +10,6 @@ func TestEval(t *testing.T) {
 	for i, c := range testCases {
 		d, s := builtins.Dict(), c.stack
 		for _, val := range c.vals {
-			//t.Log("\nVAL", val)
-			//t.Log("\nDICT", d)
-			//t.Log("\nSTACK\t", s)
 			err := Eval(val, d, s)
 			if err != nil {
 				failEvalTest(t, i, c, c.stack, err.Error())
@@ -25,6 +22,7 @@ func TestEval(t *testing.T) {
 
 	}
 }
+
 func failEvalTest(t *testing.T, i int, c testCase, got *data.Stack, msg string) {
 	t.Fatalf("FAIL: %s\nWant: %s\nGot: %s\n%s\n\n", c.description, c.wantStack, got, msg)
 }
@@ -105,7 +103,7 @@ var testCases = []testCase{
 		"defining a word",
 		&data.Stack{},
 		[]data.Value{
-			data.NewNumber(99),
+			data.NewQuotation(data.NewNumber(99)),
 			data.NewString("cool-num"),
 			data.NewWord("define"),
 			data.NewWord("cool-num"),
@@ -118,7 +116,7 @@ var testCases = []testCase{
 		"evaluating a word and operating on it",
 		&data.Stack{},
 		[]data.Value{
-			data.NewNumber(99),
+			data.NewQuotation(data.NewNumber(99)),
 			data.NewString("cool-num"),
 			data.NewWord("define"),
 			data.NewWord("cool-num"),
@@ -194,7 +192,6 @@ var testCases = []testCase{
 			data.NewWord("define"),
 			data.NewNumber(11),
 			data.NewWord("increment"),
-			data.NewWord("apply"),
 		},
 		data.NewStack(
 			data.NewNumber(12),
@@ -204,17 +201,17 @@ var testCases = []testCase{
 		"definitions are local to their enclosing quotation",
 		data.NewStack(
 			data.NewQuotation(
-				data.NewString("outer value"),
+				data.NewQuotation(data.NewString("outer value")),
 				data.NewString("x"),
 				data.NewWord("define"),
 				data.NewWord("x"),
 				data.NewQuotation(
-					data.NewString("inner value"),
+					data.NewQuotation(data.NewString("inner value")),
 					data.NewString("x"),
 					data.NewWord("define"),
 					data.NewWord("x"),
 					data.NewQuotation(
-						data.NewString("innermost value"),
+						data.NewQuotation(data.NewString("innermost value")),
 						data.NewString("x"),
 						data.NewWord("define"),
 						data.NewWord("x"),
@@ -255,11 +252,11 @@ var testCases = []testCase{
 		data.NewStack(
 			data.NewQuotation(
 				data.NewString("predicate"),
-				data.NewWord("define"),
+				data.NewWord("let"),
 				data.NewString("alternative"),
-				data.NewWord("define"),
+				data.NewWord("let"),
 				data.NewString("consequent"),
-				data.NewWord("define"),
+				data.NewWord("let"),
 				data.NewWord("consequent"), data.NewWord("predicate"), data.NewWord("then"),
 				data.NewWord("alternative"), data.NewWord("predicate"), data.NewWord("not"), data.NewWord("then"),
 			),
@@ -270,63 +267,23 @@ var testCases = []testCase{
 			data.NewString("This value won't."),
 			data.NewBoolean(true),
 			data.NewWord("if"),
-			data.NewWord("apply"),
 		},
 		data.NewStack(data.NewString("This value will be on the stack.")),
-	},
-	{
-		"simple recursive definition",
-		data.NewStack(
-			data.NewQuotation(
-				data.NewString("x"),
-				data.NewWord("define"),
-				data.NewWord("x"), data.NewNumber(0), data.NewWord("="), data.NewString("done"), data.NewWord("define"),
-				data.NewQuotation(
-					data.NewWord("x"), //data.NewWord("say"),
-				),
-				data.NewWord("done"), data.NewWord("then"),
-
-				data.NewQuotation(
-					data.NewWord("x"), // Push on the stack
-					data.NewWord("x"), data.NewNumber(1), data.NewWord("-"), data.NewWord("countdown"), data.NewWord("apply"),
-				),
-				data.NewWord("done"), data.NewWord("not"), data.NewWord("then"), data.NewWord("apply"),
-			),
-		),
-		[]data.Value{
-			data.NewString("countdown"), data.NewWord("define"),
-			data.NewNumber(10),
-			data.NewWord("countdown"),
-			data.NewWord("apply"),
-		},
-		data.NewStack(
-			data.NewNumber(0),
-			data.NewNumber(1),
-			data.NewNumber(2),
-			data.NewNumber(3),
-			data.NewNumber(4),
-			data.NewNumber(5),
-			data.NewNumber(6),
-			data.NewNumber(7),
-			data.NewNumber(8),
-			data.NewNumber(9),
-			data.NewNumber(10),
-		),
 	},
 	{
 		"fibonacci",
 		data.NewStack(
 			/*
 				{
-					"x" define
+					"x" let
 					{0} 0 x = then
 					{1} 1 x = then
-					{x 1 - fib apply x 2 - fib apply +} 0 x = 1 x = or not then apply
+					{x 1 - fib x 2 - fib +} 0 x = 1 x = or not then apply
 				} "fib" define
-				4 fib apply
+				4 fib
 			*/
 			data.NewQuotation(
-				data.NewString("x"), data.NewWord("define"),
+				data.NewString("x"), data.NewWord("let"),
 				data.NewQuotation(data.NewNumber(0)), data.NewNumber(0), data.NewWord("x"), data.NewWord("="), data.NewWord("then"),
 				data.NewQuotation(data.NewNumber(1)), data.NewNumber(1), data.NewWord("x"), data.NewWord("="), data.NewWord("then"),
 
@@ -335,12 +292,10 @@ var testCases = []testCase{
 					data.NewNumber(1),
 					data.NewWord("-"),
 					data.NewWord("fib"),
-					data.NewWord("apply"),
 					data.NewWord("x"),
 					data.NewNumber(2),
 					data.NewWord("-"),
 					data.NewWord("fib"),
-					data.NewWord("apply"),
 					data.NewWord("+"),
 				),
 				data.NewNumber(0), data.NewWord("x"), data.NewWord("="),
@@ -355,7 +310,6 @@ var testCases = []testCase{
 			data.NewString("fib"), data.NewWord("define"),
 			data.NewNumber(10),
 			data.NewWord("fib"),
-			data.NewWord("apply"),
 		},
 		data.NewStack(
 			data.NewNumber(55),

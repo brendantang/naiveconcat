@@ -4,7 +4,7 @@ import (
 	"github.com/brendantang/naiveconcat/data"
 )
 
-func define(d *data.Dictionary, s *data.Stack) error {
+func let(d *data.Dictionary, s *data.Stack) error {
 	wordName, err := s.Pop()
 	if err != nil {
 		return err
@@ -19,5 +19,4 @@ func define(d *data.Dictionary, s *data.Stack) error {
 
 	d.Set(wordName.Str, definition)
 	return nil
-
 }

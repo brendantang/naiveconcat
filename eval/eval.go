@@ -41,6 +41,29 @@ func Eval(val data.Value, d *data.Dictionary, s *data.Stack) error {
 				}
 			}
 			return nil
+		case "define": // handle special `define` keyword
+			wordName, err := s.Pop()
+			if err != nil {
+				return err
+			}
+			if wordName.Type != data.String {
+				return data.TypeError(wordName, data.String)
+			}
+			definition, err := s.Pop()
+			if err != nil {
+				return err
+			}
+			if definition.Type != data.Quotation {
+				return data.TypeError(definition, data.Quotation)
+			}
+			proc := data.NewProc(
+				func(d *data.Dictionary, s *data.Stack) error {
+					return apply(definition, d, s)
+				},
+			)
+			d.Set(wordName.Str, proc)
+
+			return nil
 			/*
 				case "each": // "each" keyword iterates over the items in a quotation
 					iter, err := s.Pop()
