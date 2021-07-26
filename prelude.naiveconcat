@@ -13,7 +13,21 @@
   apply
 } "if" define
 
+-- each
+{ -- Not tail recursive, could have bad performance
+	"f" define
+	length "l" define
+	{
+		lop 
+		f apply
+		{f each apply}  length 0 = not  then apply
+	} l 0 = not then apply
+} "each" define
+
+-- STACK MANIPULATION
 
 {
-  
-} "cond" define
+  "a" define
+  "b" define
+  a b
+} "swap" define
