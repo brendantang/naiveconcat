@@ -3,7 +3,7 @@
 A simple concatenative programming language written in Go.
 WIP.
 
-Draws a lot of inspiration from Factor, Forth, Scheme. I leaned a lot on [Rob Pike's talk](https://www.youtube.com/watch?v=HxaD_trXwRE&t=2440s) about building a lexer.
+Draws inspiration from Factor, Forth, Scheme. I leaned a lot on [Rob Pike's talk](https://www.youtube.com/watch?v=HxaD_trXwRE&t=2440s) about building a lexer.
 
 
 ## Overview
