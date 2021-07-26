@@ -39,8 +39,10 @@ func StdDict() *data.Dictionary {
 			// STACK MANIPULATION
 			"dup":    data.NewProc(dup),    // pop a, push a, push a
 			"drop":   data.NewProc(drop),   // pop a, discard it
-			"apply":  data.NewProc(apply),  // pop x. if x is a quotation, eval each item. otherwise, eval x.
 			"lambda": data.NewProc(lambda), // pop x, push a proc that evals to x.
+
+			// APPLY
+			"apply": data.NewProc(apply), // pop x. if x is a quotation, eval each item. otherwise, eval x.
 		},
 	)
 }
