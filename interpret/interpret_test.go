@@ -1,8 +1,8 @@
 package interpret
 
 import (
-	"github.com/brendantang/naiveconcat/builtins"
 	"github.com/brendantang/naiveconcat/data"
+	"github.com/brendantang/naiveconcat/eval"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -22,7 +22,7 @@ func TestInterpret(t *testing.T) {
 		os.Stdout = tmp
 
 		// interpret the test case
-		d, s := builtins.Dict(), data.NewStack()
+		d, s := eval.StdDict(), data.NewStack()
 		err = Interpret(c.src, d, s)
 		if err != nil {
 			failInterpretTest(t, c, "interpreter error", err.Error())

@@ -1,14 +1,13 @@
 package eval
 
 import (
-	"github.com/brendantang/naiveconcat/builtins"
 	"github.com/brendantang/naiveconcat/data"
 	"testing"
 )
 
 func TestEval(t *testing.T) {
 	for i, c := range testCases {
-		d, s := builtins.Dict(), c.stack
+		d, s := StdDict(), c.stack
 		for _, val := range c.vals {
 			err := Eval(val, d, s)
 			if err != nil {

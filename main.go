@@ -5,8 +5,8 @@ package main
 import (
 	"bufio"
 	"flag"
-	"github.com/brendantang/naiveconcat/builtins"
 	"github.com/brendantang/naiveconcat/data"
+	"github.com/brendantang/naiveconcat/eval"
 	"github.com/brendantang/naiveconcat/interpret"
 	"io/ioutil"
 	"log"
@@ -20,7 +20,7 @@ func main() {
 		Prompt:       "> ",
 		Verbose:      *verbose,
 		Input:        bufio.NewReader(os.Stdin),
-		InitialDict:  builtins.Dict(),
+		InitialDict:  eval.StdDict(),
 		InitialStack: data.NewStack(),
 	}
 	filepath := flag.Arg(0)
@@ -29,7 +29,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		err = interpret.Interpret(string(content), builtins.Dict(), data.NewStack())
+		err = interpret.Interpret(string(content), eval.StdDict(), data.NewStack())
 		if err != nil {
 			log.Fatal(err)
 		}
