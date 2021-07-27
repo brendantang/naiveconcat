@@ -6,12 +6,16 @@ import (
 	"strconv"
 )
 
+// The Parser receives from a channel of tokens and parses them into naiveconcat
+// values. Values are sent on the Out channel, and parsing errors are sent on
+// the Errs channel.
 type Parser struct {
 	in   chan token      // where lexed tokens are received.
-	Out  chan data.Value // where parsed expressions are sent.
+	Out  chan data.Value // where parsed values are sent.
 	Errs chan error      // where parsing errors are sent.
 }
 
+// NewParser makes a new Parser with the given input channel and new channels for emitting values and errors.
 func NewParser(input chan token) *Parser {
 	return &Parser{
 		in:   input,

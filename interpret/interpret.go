@@ -52,6 +52,11 @@ func Interpret(input string, d *data.Dictionary, s *data.Stack) error {
 				more = false
 				return parseErr
 			}
+		case lexErr := <-l.Errs:
+			if lexErr != nil {
+				more = false
+				return lexErr
+			}
 		}
 	}
 	return nil
