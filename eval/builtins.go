@@ -13,6 +13,7 @@ func CoreDict() *data.Dictionary {
 			// IO
 			"say":   data.NewProc(say),       // pop a value and print it
 			"stack": data.NewProc(showStack), // print the whole stack
+			"words": data.NewProc(showStack), // print all word definitions
 
 			// MATH
 			"+": data.NewProc(add),      // pop two numbers and push their sum
