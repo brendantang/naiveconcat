@@ -12,7 +12,7 @@ func length(d *data.Dictionary, s *data.Stack) error {
 		return err
 	}
 	if quot.Type != data.Quotation {
-		return data.TypeError(quot, data.Quotation)
+		return data.NewTypeErr(quot, data.Quotation)
 	}
 	s.Push(data.NewNumber(float64(len(quot.Quotation))))
 
@@ -27,7 +27,7 @@ func lop(d *data.Dictionary, s *data.Stack) error {
 		return err
 	}
 	if quot.Type != data.Quotation {
-		return data.TypeError(quot, data.Quotation)
+		return data.NewTypeErr(quot, data.Quotation)
 	}
 	head, tail := quot.Quotation[0], quot.Quotation[1:]
 	s.Push(data.NewQuotation(tail...))

@@ -11,7 +11,7 @@ func not(d *data.Dictionary, s *data.Stack) error {
 		return err
 	}
 	if b.Type != data.Boolean {
-		return data.TypeError(b, data.Boolean)
+		return data.NewTypeErr(b, data.Boolean)
 	}
 	s.Push(data.NewBoolean(!b.Bool))
 	return nil
@@ -25,14 +25,14 @@ func or(d *data.Dictionary, s *data.Stack) error {
 		return err
 	}
 	if a.Type != data.Boolean {
-		return data.TypeError(a, data.Boolean)
+		return data.NewTypeErr(a, data.Boolean)
 	}
 	b, err := s.Pop()
 	if err != nil {
 		return err
 	}
 	if b.Type != data.Boolean {
-		return data.TypeError(b, data.Boolean)
+		return data.NewTypeErr(b, data.Boolean)
 	}
 	s.Push(data.NewBoolean(b.Bool || a.Bool))
 	return nil
@@ -46,14 +46,14 @@ func and(d *data.Dictionary, s *data.Stack) error {
 		return err
 	}
 	if a.Type != data.Boolean {
-		return data.TypeError(a, data.Boolean)
+		return data.NewTypeErr(a, data.Boolean)
 	}
 	b, err := s.Pop()
 	if err != nil {
 		return err
 	}
 	if b.Type != data.Boolean {
-		return data.TypeError(b, data.Boolean)
+		return data.NewTypeErr(b, data.Boolean)
 	}
 	s.Push(data.NewBoolean(b.Bool && a.Bool))
 	return nil
@@ -67,7 +67,7 @@ func then(d *data.Dictionary, s *data.Stack) error {
 		return err
 	}
 	if predicate.Type != data.Boolean {
-		return data.TypeError(predicate, data.Boolean)
+		return data.NewTypeErr(predicate, data.Boolean)
 	}
 	consequent, err := s.Pop()
 	if err != nil {

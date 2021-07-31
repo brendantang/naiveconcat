@@ -12,7 +12,7 @@ func let(d *data.Dictionary, s *data.Stack) error {
 		return err
 	}
 	if wordName.Type != data.String {
-		return data.TypeError(wordName, data.String)
+		return data.NewTypeErr(wordName, data.String)
 	}
 	definition, err := s.Pop()
 	if err != nil {
@@ -31,7 +31,7 @@ func define(d *data.Dictionary, s *data.Stack) error {
 		return err
 	}
 	if wordName.Type != data.String {
-		return data.TypeError(wordName, data.String)
+		return data.NewTypeErr(wordName, data.String)
 	}
 	definition, err := s.Pop()
 	if err != nil {

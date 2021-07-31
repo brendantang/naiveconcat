@@ -1,7 +1,6 @@
 package data
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 )
@@ -25,7 +24,7 @@ func (s *Stack) Push(d Value) {
 // Pop removes the top item from the Stack and returns them both.
 func (s *Stack) Pop() (Value, error) {
 	if len(s.data) < 1 {
-		return Value{}, errors.New(emptyStackError)
+		return Value{}, EmptyStackErr{}
 	}
 	var d Value
 	d, s.data = s.data[0], s.data[1:]
@@ -35,7 +34,7 @@ func (s *Stack) Pop() (Value, error) {
 // Peek returns the top item from the Stack without consuming it.
 func (s *Stack) Peek() (Value, error) {
 	if len(s.data) < 1 {
-		return Value{}, errors.New(emptyStackError)
+		return Value{}, EmptyStackErr{}
 	}
 	return s.data[0], nil
 }
@@ -48,4 +47,10 @@ func (s *Stack) String() string {
 	return fmt.Sprintf("[%s]", strings.Join(strs, " "))
 }
 
-const emptyStackError = "tried to access the top item of the Stack, but the Stack is empty"
+// An EmptyStackErr indicates when the user tries to access an item from the
+// stack, but the stack is empty.
+type EmptyStackErr struct{}
+
+func (err EmptyStackErr) Error() string {
+	return "tried to access the top item of the Stack, but the Stack is empty"
+}

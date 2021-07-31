@@ -22,7 +22,7 @@ func TestInterpret(t *testing.T) {
 		os.Stdout = tmp
 
 		// interpret the test case
-		d, s := eval.StdDict(), data.NewStack()
+		d, s := eval.CoreDict(), data.NewStack()
 		err = Interpret(c.src, d, s)
 		if err != nil {
 			failInterpretTest(t, c, "interpreter error", err.Error())
@@ -131,7 +131,7 @@ var interpretTestCases = []interpretTestCase{
 	{
 		"implement `each` using `then`",
 		`
-			{ -- Not tail recursive, could have bad performance
+			{ -- Not tail recursive, could have bad performance?
 				"f" let
 				length "l" let
 				{

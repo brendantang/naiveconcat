@@ -10,14 +10,14 @@ func add(d *data.Dictionary, s *data.Stack) error {
 		return err
 	}
 	if a.Type != data.Number {
-		return data.TypeError(a, data.Number)
+		return data.NewTypeErr(a, data.Number)
 	}
 	b, err := s.Pop()
 	if err != nil {
 		return err
 	}
 	if b.Type != data.Number {
-		return data.TypeError(b, data.Number)
+		return data.NewTypeErr(b, data.Number)
 	}
 	s.Push(data.NewNumber(b.Number + a.Number))
 
@@ -30,14 +30,14 @@ func subtract(d *data.Dictionary, s *data.Stack) error {
 		return err
 	}
 	if a.Type != data.Number {
-		return data.TypeError(a, data.Number)
+		return data.NewTypeErr(a, data.Number)
 	}
 	b, err := s.Pop()
 	if err != nil {
 		return err
 	}
 	if b.Type != data.Number {
-		return data.TypeError(b, data.Number)
+		return data.NewTypeErr(b, data.Number)
 	}
 	s.Push(data.NewNumber(b.Number - a.Number))
 
@@ -50,14 +50,14 @@ func multiply(d *data.Dictionary, s *data.Stack) error {
 		return err
 	}
 	if a.Type != data.Number {
-		return data.TypeError(a, data.Number)
+		return data.NewTypeErr(a, data.Number)
 	}
 	b, err := s.Pop()
 	if err != nil {
 		return err
 	}
 	if b.Type != data.Number {
-		return data.TypeError(b, data.Number)
+		return data.NewTypeErr(b, data.Number)
 	}
 	s.Push(data.NewNumber(a.Number * b.Number))
 
@@ -70,14 +70,14 @@ func divide(d *data.Dictionary, s *data.Stack) error {
 		return err
 	}
 	if a.Type != data.Number {
-		return data.TypeError(a, data.Number)
+		return data.NewTypeErr(a, data.Number)
 	}
 	b, err := s.Pop()
 	if err != nil {
 		return err
 	}
 	if b.Type != data.Number {
-		return data.TypeError(b, data.Number)
+		return data.NewTypeErr(b, data.Number)
 	}
 	s.Push(data.NewNumber(b.Number / a.Number))
 
@@ -90,14 +90,14 @@ func equal(d *data.Dictionary, s *data.Stack) error {
 		return err
 	}
 	if a.Type != data.Number {
-		return data.TypeError(a, data.Number)
+		return data.NewTypeErr(a, data.Number)
 	}
 	b, err := s.Pop()
 	if err != nil {
 		return err
 	}
 	if b.Type != data.Number {
-		return data.TypeError(b, data.Number)
+		return data.NewTypeErr(b, data.Number)
 	}
 	s.Push(data.NewBoolean(b.Number == a.Number))
 

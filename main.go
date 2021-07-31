@@ -4,6 +4,7 @@ package main
 
 import (
 	"bufio"
+	_ "embed"
 	"flag"
 	"github.com/brendantang/naiveconcat/data"
 	"github.com/brendantang/naiveconcat/eval"
@@ -13,15 +14,27 @@ import (
 	"os"
 )
 
+//go:embed prelude.naiveconcat
+var prelude string
+
 func main() {
 	verbose := flag.Bool("verbose", false, "Print out the stack at each REPL loop")
+	coreOnly := flag.Bool("core", false, "Skip the standard library, start with built-ins only")
 	flag.Parse()
+	dict := eval.CoreDict()
+	stack := data.NewStack()
+	if !*coreOnly {
+		err := interpret.Interpret(prelude, dict, stack)
+		if err != nil {
+			log.Fatalf("error interpreting the standard library: %v", err)
+		}
+	}
 	cfg := interpret.Config{
 		Prompt:       "> ",
 		Verbose:      *verbose,
 		Input:        bufio.NewReader(os.Stdin),
-		InitialDict:  eval.StdDict(),
-		InitialStack: data.NewStack(),
+		InitialDict:  dict,
+		InitialStack: stack,
 	}
 	filepath := flag.Arg(0)
 	if filepath != "" {
@@ -29,7 +42,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		err = interpret.Interpret(string(content), eval.StdDict(), data.NewStack())
+		err = interpret.Interpret(string(content), dict, stack)
 		if err != nil {
 			log.Fatal(err)
 		}

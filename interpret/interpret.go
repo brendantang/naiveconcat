@@ -79,7 +79,7 @@ func REPL(cfg Config) error {
 		fmt.Print(cfg.Prompt)
 		input, err := cfg.Input.ReadString('\n')
 		if err != nil {
-			return fmt.Errorf("Error reading input: %e", err)
+			return fmt.Errorf("error reading input: %w", err)
 		}
 
 		// interpret the line
@@ -96,5 +96,5 @@ func REPL(cfg Config) error {
 }
 
 func importErr(path string, err error) error {
-	return fmt.Errorf("error loading import '%s': %v", path, err)
+	return fmt.Errorf("error loading import '%s': %w", path, err)
 }

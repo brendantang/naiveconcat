@@ -4,8 +4,9 @@ import (
 	"github.com/brendantang/naiveconcat/data"
 )
 
-// StdDict returns a data.Dictionary with bindings for the standard primitive words.
-func StdDict() *data.Dictionary {
+// CoreDict returns a data.Dictionary with word bindings for built-in primitive
+// values.
+func CoreDict() *data.Dictionary {
 	return data.NewDictionary(
 		nil,
 		map[string]data.Value{

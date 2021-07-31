@@ -20,6 +20,8 @@ type Value struct {
 // Type describes the internal type of a Value.
 type Type int
 
+// A naiveconcat value is a number, string, word, procedure, quotation, or
+// boolean.
 const (
 	Number Type = iota
 	String
@@ -131,7 +133,17 @@ func NewBoolean(b bool) Value {
 	}
 }
 
-// TypeError indicates when a Value does not have its expected type.
-func TypeError(v Value, t Type) error {
-	return fmt.Errorf("type error: expected '%s' (%s) to be type %s ", v, v.Type, t)
+// A TypeErr indicates when a naiveconcat Value does not have its expected type.
+type TypeErr struct {
+	val      Value
+	expected Type
+}
+
+// NewTypeErr returns a TypeErr.
+func NewTypeErr(val Value, expected Type) error {
+	return TypeErr{val, expected}
+}
+
+func (e TypeErr) Error() string {
+	return fmt.Sprintf("type error: expected '%s' (%s) to be type %s ", e.val, e.val.Type, e.expected)
 }
