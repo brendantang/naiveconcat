@@ -8,6 +8,9 @@ func TestInterpretCoreWords(t *testing.T) {
 	testInterpret(t, coreWordTestCases)
 }
 
+func TestWords(t *testing.T) {
+}
+
 var coreWordTestCases = []interpretTestCase{
 	{
 		"say",
@@ -17,5 +20,47 @@ var coreWordTestCases = []interpretTestCase{
 		{5 +} lambda say
 		`,
 		"\"bar\"\n\"foo\"\n1.234567\n{5 +}\nPROCEDURE",
+	},
+	{
+		"stack",
+		`"foo" "bar" 1.234567 {5 +} {5 +} lambda
+		stack
+		`,
+		"[\"foo\" \"bar\" 1.234567 {5 +} PROCEDURE]",
+	},
+	{
+		"words",
+		`
+		3 "three" let
+		words
+		`,
+		`*	PROCEDURE
++	PROCEDURE
+-	PROCEDURE
+/	PROCEDURE
+=	PROCEDURE
+and	PROCEDURE
+apply	PROCEDURE
+define	PROCEDURE
+drop	PROCEDURE
+dup	PROCEDURE
+false	FALSE
+lambda	PROCEDURE
+length	PROCEDURE
+let	PROCEDURE
+lop	PROCEDURE
+not	PROCEDURE
+or	PROCEDURE
+say	PROCEDURE
+stack	PROCEDURE
+then	PROCEDURE
+three	3
+true	TRUE
+words	PROCEDURE`,
+	},
+	{
+		"words with a local dict",
+		`{"foo" "x" let words} apply`,
+		`x	"foo"`,
 	},
 }

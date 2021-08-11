@@ -8,7 +8,14 @@ import (
 // for the data it binds in the Dictionary.
 type Dictionary struct {
 	parent   *Dictionary
-	bindings map[string]Value
+	Bindings map[string]Value
+}
+
+func (dict *Dictionary) String() (s string) {
+	for w, def := range dict.Bindings {
+		s = fmt.Sprintf("%s\n%s:\t%s", s, w, def)
+	}
+	return
 }
 
 // NewDictionary takes a map of word bindings and returns a Dictionary.
@@ -19,7 +26,7 @@ func NewDictionary(parent *Dictionary, bindings map[string]Value) *Dictionary {
 // Get retrieves the Value of a word. If a definition isn't found, look
 // recursively in each parent Dictionary.
 func (dict *Dictionary) Get(word string) (d Value, ok bool) {
-	d, ok = dict.bindings[word]
+	d, ok = dict.Bindings[word]
 	if !ok && dict.parent != nil {
 		return dict.parent.Get(word)
 	}
@@ -28,16 +35,10 @@ func (dict *Dictionary) Get(word string) (d Value, ok bool) {
 
 // Set saves the definition of a word.
 func (dict *Dictionary) Set(word string, val Value) {
-	dict.bindings[word] = val
+	dict.Bindings[word] = val
 }
 
-func (dict *Dictionary) String() (s string) {
-	for w, def := range dict.bindings {
-		s = fmt.Sprintf("%s\n%s:\t%s", s, w, def)
-	}
-	return
-}
-
+// Depth returns the number of parent Dictionaries wrapping dict.
 func (dict *Dictionary) Depth() int {
 	if dict.parent == nil {
 		return 0
