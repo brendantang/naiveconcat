@@ -7,12 +7,9 @@ import (
 // let pops a string and the next value, then saves a word named for that string
 // which evaluates to that value.
 func let(d *data.Dictionary, s *data.Stack) error {
-	wordName, err := s.Pop()
+	wordName, err := s.PopType(data.String)
 	if err != nil {
 		return err
-	}
-	if wordName.Type != data.String {
-		return data.NewTypeErr(wordName, data.String)
 	}
 	definition, err := s.Pop()
 	if err != nil {
@@ -26,12 +23,9 @@ func let(d *data.Dictionary, s *data.Stack) error {
 // define pops a string and the next value, then saves a word named for that string which evaluates to a procedure that applies that value.
 func define(d *data.Dictionary, s *data.Stack) error {
 
-	wordName, err := s.Pop()
+	wordName, err := s.PopType(data.String)
 	if err != nil {
 		return err
-	}
-	if wordName.Type != data.String {
-		return data.NewTypeErr(wordName, data.String)
 	}
 	definition, err := s.Pop()
 	if err != nil {

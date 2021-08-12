@@ -22,12 +22,9 @@ func length(d *data.Dictionary, s *data.Stack) error {
 // lop pops the quotation on top of the stack, then pushes its tail, then pushes
 // its head.
 func lop(d *data.Dictionary, s *data.Stack) error {
-	quot, err := s.Pop()
+	quot, err := s.PopType(data.Quotation)
 	if err != nil {
 		return err
-	}
-	if quot.Type != data.Quotation {
-		return data.NewTypeErr(quot, data.Quotation)
 	}
 	head, tail := quot.Quotation[0], quot.Quotation[1:]
 	s.Push(data.NewQuotation(tail...))

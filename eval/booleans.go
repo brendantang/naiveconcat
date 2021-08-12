@@ -6,12 +6,9 @@ import (
 
 // not pops a boolean and pushes its negation.
 func not(d *data.Dictionary, s *data.Stack) error {
-	b, err := s.Pop()
+	b, err := s.PopType(data.Boolean)
 	if err != nil {
 		return err
-	}
-	if b.Type != data.Boolean {
-		return data.NewTypeErr(b, data.Boolean)
 	}
 	s.Push(data.NewBoolean(!b.Bool))
 	return nil
@@ -20,19 +17,13 @@ func not(d *data.Dictionary, s *data.Stack) error {
 // or pops two booleans and pushes TRUE if either of them is TRUE, FALSE
 // otherwise.
 func or(d *data.Dictionary, s *data.Stack) error {
-	a, err := s.Pop()
+	a, err := s.PopType(data.Boolean)
 	if err != nil {
 		return err
 	}
-	if a.Type != data.Boolean {
-		return data.NewTypeErr(a, data.Boolean)
-	}
-	b, err := s.Pop()
+	b, err := s.PopType(data.Boolean)
 	if err != nil {
 		return err
-	}
-	if b.Type != data.Boolean {
-		return data.NewTypeErr(b, data.Boolean)
 	}
 	s.Push(data.NewBoolean(b.Bool || a.Bool))
 	return nil
@@ -41,19 +32,13 @@ func or(d *data.Dictionary, s *data.Stack) error {
 // and pops two booleans and pushes TRUE if both of them are TRUE, FALSE
 // otherwise.
 func and(d *data.Dictionary, s *data.Stack) error {
-	a, err := s.Pop()
+	a, err := s.PopType(data.Boolean)
 	if err != nil {
 		return err
 	}
-	if a.Type != data.Boolean {
-		return data.NewTypeErr(a, data.Boolean)
-	}
-	b, err := s.Pop()
+	b, err := s.PopType(data.Boolean)
 	if err != nil {
 		return err
-	}
-	if b.Type != data.Boolean {
-		return data.NewTypeErr(b, data.Boolean)
 	}
 	s.Push(data.NewBoolean(b.Bool && a.Bool))
 	return nil
@@ -62,12 +47,9 @@ func and(d *data.Dictionary, s *data.Stack) error {
 // then pops a predicate and a value. If the predicate is TRUE, push the value.
 // Otherwise discard it.
 func then(d *data.Dictionary, s *data.Stack) error {
-	predicate, err := s.Pop()
+	predicate, err := s.PopType(data.Boolean)
 	if err != nil {
 		return err
-	}
-	if predicate.Type != data.Boolean {
-		return data.NewTypeErr(predicate, data.Boolean)
 	}
 	consequent, err := s.Pop()
 	if err != nil {

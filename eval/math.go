@@ -5,19 +5,13 @@ import (
 )
 
 func add(d *data.Dictionary, s *data.Stack) error {
-	a, err := s.Pop()
+	a, err := s.PopType(data.Number)
 	if err != nil {
 		return err
 	}
-	if a.Type != data.Number {
-		return data.NewTypeErr(a, data.Number)
-	}
-	b, err := s.Pop()
+	b, err := s.PopType(data.Number)
 	if err != nil {
 		return err
-	}
-	if b.Type != data.Number {
-		return data.NewTypeErr(b, data.Number)
 	}
 	s.Push(data.NewNumber(b.Number + a.Number))
 
@@ -25,19 +19,13 @@ func add(d *data.Dictionary, s *data.Stack) error {
 }
 
 func subtract(d *data.Dictionary, s *data.Stack) error {
-	a, err := s.Pop()
+	a, err := s.PopType(data.Number)
 	if err != nil {
 		return err
 	}
-	if a.Type != data.Number {
-		return data.NewTypeErr(a, data.Number)
-	}
-	b, err := s.Pop()
+	b, err := s.PopType(data.Number)
 	if err != nil {
 		return err
-	}
-	if b.Type != data.Number {
-		return data.NewTypeErr(b, data.Number)
 	}
 	s.Push(data.NewNumber(b.Number - a.Number))
 
@@ -45,19 +33,13 @@ func subtract(d *data.Dictionary, s *data.Stack) error {
 }
 
 func multiply(d *data.Dictionary, s *data.Stack) error {
-	a, err := s.Pop()
+	a, err := s.PopType(data.Number)
 	if err != nil {
 		return err
 	}
-	if a.Type != data.Number {
-		return data.NewTypeErr(a, data.Number)
-	}
-	b, err := s.Pop()
+	b, err := s.PopType(data.Number)
 	if err != nil {
 		return err
-	}
-	if b.Type != data.Number {
-		return data.NewTypeErr(b, data.Number)
 	}
 	s.Push(data.NewNumber(a.Number * b.Number))
 
@@ -65,19 +47,13 @@ func multiply(d *data.Dictionary, s *data.Stack) error {
 }
 
 func divide(d *data.Dictionary, s *data.Stack) error {
-	a, err := s.Pop()
+	a, err := s.PopType(data.Number)
 	if err != nil {
 		return err
 	}
-	if a.Type != data.Number {
-		return data.NewTypeErr(a, data.Number)
-	}
-	b, err := s.Pop()
+	b, err := s.PopType(data.Number)
 	if err != nil {
 		return err
-	}
-	if b.Type != data.Number {
-		return data.NewTypeErr(b, data.Number)
 	}
 	s.Push(data.NewNumber(b.Number / a.Number))
 
@@ -85,19 +61,13 @@ func divide(d *data.Dictionary, s *data.Stack) error {
 }
 
 func equal(d *data.Dictionary, s *data.Stack) error {
-	a, err := s.Pop()
+	a, err := s.PopType(data.Number)
 	if err != nil {
 		return err
 	}
-	if a.Type != data.Number {
-		return data.NewTypeErr(a, data.Number)
-	}
-	b, err := s.Pop()
+	b, err := s.PopType(data.Number)
 	if err != nil {
 		return err
-	}
-	if b.Type != data.Number {
-		return data.NewTypeErr(b, data.Number)
 	}
 	s.Push(data.NewBoolean(b.Number == a.Number))
 
