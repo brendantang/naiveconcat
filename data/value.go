@@ -145,5 +145,10 @@ func NewTypeErr(val Value, expected Type) error {
 }
 
 func (e TypeErr) Error() string {
-	return fmt.Sprintf("type error: expected '%s' (%s) to be type %s ", e.val, e.val.Type, e.expected)
+	return fmt.Sprintf(
+		"type error: expected '%s' (%s) to be type %s ",
+		e.val,
+		e.val.Type,
+		e.expected,
+	)
 }

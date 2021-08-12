@@ -33,5 +33,4 @@ func apply(d *data.Dictionary, s *data.Stack) error {
 		return err
 	}
 	return nil
-
 }

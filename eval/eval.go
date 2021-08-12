@@ -9,7 +9,6 @@ import (
 // strings, quotations, and booleans are pushed on the stack. Words are
 // substituted for their definition, then evaluated. Procedures are executed.
 func Eval(val data.Value, d *data.Dictionary, s *data.Stack) error {
-
 	switch val.Type {
 
 	// literal values are pushed on the stack

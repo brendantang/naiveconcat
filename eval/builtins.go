@@ -6,7 +6,6 @@ import (
 	"sort"
 )
 
-
 // CoreDict returns a data.Dictionary with word bindings for built-in primitive
 // values.
 func CoreDict() *data.Dictionary {
@@ -53,10 +52,7 @@ func CoreDict() *data.Dictionary {
 	)
 }
 
-
-
 // IO.
-
 
 func say(d *data.Dictionary, s *data.Stack) error {
 	val, err := s.Pop()
@@ -67,12 +63,10 @@ func say(d *data.Dictionary, s *data.Stack) error {
 	return nil
 }
 
-
 func showStack(d *data.Dictionary, s *data.Stack) error {
 	fmt.Println(s)
 	return nil
 }
-
 
 func showDict(d *data.Dictionary, s *data.Stack) error {
 	words := make([]string, 0, len(d.Bindings))
@@ -86,10 +80,7 @@ func showDict(d *data.Dictionary, s *data.Stack) error {
 	return nil
 }
 
-
-
 // Math.
-
 
 func add(d *data.Dictionary, s *data.Stack) error {
 	a, err := s.PopType(data.Number)
@@ -105,7 +96,6 @@ func add(d *data.Dictionary, s *data.Stack) error {
 	return nil
 }
 
-
 func subtract(d *data.Dictionary, s *data.Stack) error {
 	a, err := s.PopType(data.Number)
 	if err != nil {
@@ -119,7 +109,6 @@ func subtract(d *data.Dictionary, s *data.Stack) error {
 
 	return nil
 }
-
 
 func multiply(d *data.Dictionary, s *data.Stack) error {
 	a, err := s.PopType(data.Number)
@@ -135,7 +124,6 @@ func multiply(d *data.Dictionary, s *data.Stack) error {
 	return nil
 }
 
-
 func divide(d *data.Dictionary, s *data.Stack) error {
 	a, err := s.PopType(data.Number)
 	if err != nil {
@@ -149,7 +137,6 @@ func divide(d *data.Dictionary, s *data.Stack) error {
 
 	return nil
 }
-
 
 func equal(d *data.Dictionary, s *data.Stack) error {
 	a, err := s.PopType(data.Number)
@@ -165,10 +152,7 @@ func equal(d *data.Dictionary, s *data.Stack) error {
 	return nil
 }
 
-
-
 // Booleans.
-
 
 // not pops a boolean and pushes its negation.
 func not(d *data.Dictionary, s *data.Stack) error {
@@ -179,7 +163,6 @@ func not(d *data.Dictionary, s *data.Stack) error {
 	s.Push(data.NewBoolean(!b.Bool))
 	return nil
 }
-
 
 // or pops two booleans and pushes TRUE if either of them is TRUE, FALSE
 // otherwise.
@@ -196,7 +179,6 @@ func or(d *data.Dictionary, s *data.Stack) error {
 	return nil
 }
 
-
 // and pops two booleans and pushes TRUE if both of them are TRUE, FALSE
 // otherwise.
 func and(d *data.Dictionary, s *data.Stack) error {
@@ -211,7 +193,6 @@ func and(d *data.Dictionary, s *data.Stack) error {
 	s.Push(data.NewBoolean(b.Bool && a.Bool))
 	return nil
 }
-
 
 // then pops a predicate and a value. If the predicate is TRUE, push the value.
 // Otherwise discard it.
@@ -233,10 +214,7 @@ func then(d *data.Dictionary, s *data.Stack) error {
 	return nil
 }
 
-
-
 // Quotation manipulation.
-
 
 // length returns the length of the quotation on top of the stack without
 // popping it.
@@ -253,7 +231,6 @@ func length(d *data.Dictionary, s *data.Stack) error {
 	return nil
 }
 
-
 // lop pops the quotation on top of the stack, then pushes its tail, then pushes
 // its head.
 func lop(d *data.Dictionary, s *data.Stack) error {
@@ -267,7 +244,6 @@ func lop(d *data.Dictionary, s *data.Stack) error {
 
 	return nil
 }
-
 
 // appendToQuot adds a value to the end of a quotation.
 func appendToQuot(d *data.Dictionary, s *data.Stack) error {
@@ -284,10 +260,7 @@ func appendToQuot(d *data.Dictionary, s *data.Stack) error {
 	return nil
 }
 
-
-
 // Dictionary manipulation.
-
 
 // let pops a string and the next value, then saves a word named for that string
 // which evaluates to that value.
@@ -304,7 +277,6 @@ func let(d *data.Dictionary, s *data.Stack) error {
 	d.Set(wordName.Str, definition)
 	return nil
 }
-
 
 // define pops a string and the next value, then saves a word named for that string which evaluates to a procedure that applies that value.
 func define(d *data.Dictionary, s *data.Stack) error {
@@ -328,10 +300,7 @@ func define(d *data.Dictionary, s *data.Stack) error {
 	return nil
 }
 
-
-
 // Stack manipulation.
-
 
 // dup pops a value, then pushes it twice.
 func dup(d *data.Dictionary, s *data.Stack) error {
@@ -344,7 +313,6 @@ func dup(d *data.Dictionary, s *data.Stack) error {
 	return nil
 }
 
-
 // drop discards the top value on the stack
 func drop(d *data.Dictionary, s *data.Stack) error {
 	_, err := s.Pop()
@@ -353,7 +321,6 @@ func drop(d *data.Dictionary, s *data.Stack) error {
 	}
 	return nil
 }
-
 
 // lambda pops a value and pushes a procedure that evaluates to that value.
 func lambda(d *data.Dictionary, s *data.Stack) error {
