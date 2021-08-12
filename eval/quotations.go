@@ -35,3 +35,18 @@ func lop(d *data.Dictionary, s *data.Stack) error {
 
 	return nil
 }
+
+// appendToQuot adds a value to the end of a quotation.
+func appendToQuot(d *data.Dictionary, s *data.Stack) error {
+	quot, err := s.PopType(data.Quotation)
+	if err != nil {
+		return err
+	}
+	val, err := s.Pop()
+	if err != nil {
+		return err
+	}
+	vals := append(quot.Quotation, val)
+	s.Push(data.NewQuotation(vals...))
+	return nil
+}

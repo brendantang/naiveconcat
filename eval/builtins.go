@@ -31,8 +31,9 @@ func CoreDict() *data.Dictionary {
 			"then":  data.NewProc(then),     // pop a bool and x, evaluate x if the bool is TRUE
 
 			// QUOTATIONS
-			"length": data.NewProc(length), // push length of the quotation on top of the stack
-			"lop":    data.NewProc(lop),    // pop quotation { a b c ... }, push { b c ... }, push a
+			"length": data.NewProc(length),       // push length of the quotation on top of the stack
+			"lop":    data.NewProc(lop),          // pop quotation { a b c ... }, push { b c ... }, push a
+			"append": data.NewProc(appendToQuot), // pop quotation { a b c ... }, pop value d, push { a b c ... d }
 
 			// DICTIONARY MANIPULATION
 			"let":    data.NewProc(let),    // pop a string and a value, make a word named by string, defined by value

@@ -1,35 +1,39 @@
-
 -- FLOW CONTROL
+
 
 -- if
 -- `{"consequent" say} {"alternative" say} false if apply`
 -- => "alternative"
 {
-  "predicate" let 
-  "alternative" let
-  "consequent" let
-  consequent predicate then
-  alternative predicate not then
-  apply
+    "predicate" let 
+    "alternative" let
+    "consequent" let
+    consequent predicate then
+    alternative predicate not then
+    apply
 } "if" define
 
+
 -- each
-{ -- Not tail recursive, could have bad performance
-	"f" let
-	length "l" let
-	{
-		lop 
-		f apply
-		{f each}  length 0 = not  then apply
-	} l 0 = not then apply
+-- Not tail recursive, could have bad performance
+{
+    "f" let
+    length "l" let
+    {
+        lop 
+        f apply
+        {f each}  length 0 = not  then apply
+    } l 0 = not   then apply
 } "each" define
+
+
 
 -- STACK MANIPULATION
 
+
+-- swap
 {
-  "a" let
-  "b" let
-  a b
+    "a" let
+    "b" let
+    a b
 } "swap" define
-
-

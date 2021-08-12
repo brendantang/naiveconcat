@@ -40,6 +40,7 @@ var coreWordTestCases = []interpretTestCase{
 /	PROCEDURE
 =	PROCEDURE
 and	PROCEDURE
+append	PROCEDURE
 apply	PROCEDURE
 define	PROCEDURE
 drop	PROCEDURE
@@ -62,5 +63,10 @@ words	PROCEDURE`,
 		"words with a local dict",
 		`{"foo" "x" let words} apply`,
 		`x	"foo"`,
+	},
+	{
+		"append to a quotation",
+		`4 {1 2 3} append say`,
+		`{1 2 3 4}`,
 	},
 }

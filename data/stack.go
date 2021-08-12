@@ -16,12 +16,12 @@ func NewStack(values ...Value) *Stack {
 	return &Stack{values}
 }
 
-// Push puts Value d on top of the Stack and returns it.
+// Push puts Value d on top of the Stack.
 func (s *Stack) Push(d Value) {
 	s.data = append([]Value{d}, s.data...)
 }
 
-// Pop removes the top item from the Stack and returns them both.
+// Pop removes the top item from the Stack and returns it.
 func (s *Stack) Pop() (Value, error) {
 	if len(s.data) < 1 {
 		return Value{}, EmptyStackErr{}
@@ -29,6 +29,19 @@ func (s *Stack) Pop() (Value, error) {
 	var d Value
 	d, s.data = s.data[0], s.data[1:]
 	return d, nil
+}
+
+// PopType takes a Type and Pops the top value. Error reports if the stack is
+// empty or if the value doesn't match the given type.
+func (s *Stack) PopType(t Type) (Value, error) {
+	val, err := s.Pop()
+	if err != nil {
+		return val, err
+	}
+	if val.Type != t {
+		return val, NewTypeErr(val, t)
+	}
+	return val, nil
 }
 
 // Peek returns the top item from the Stack without consuming it.
