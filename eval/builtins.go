@@ -48,6 +48,10 @@ func CoreDict() *data.Dictionary {
 
 			// APPLY
 			"apply": data.NewProc(apply), // pop x. if x is a quotation, eval each item. otherwise, eval x.
+
+			// STRINGS
+			"join":  data.NewProc(join),  // pop two strings, combine them, push the result.
+			"split": data.NewProc(split), // pop an index number and a string, push the two strings made by splitting at the index.
 		},
 	)
 }
@@ -335,5 +339,40 @@ func lambda(d *data.Dictionary, s *data.Stack) error {
 		},
 	)
 	s.Push(proc)
+	return nil
+}
+
+// Strings.
+
+// join pops string b and string a and pushes string a + b.
+func join(d *data.Dictionary, s *data.Stack) error {
+	b, err := s.PopType(data.String)
+	if err != nil {
+		return err
+	}
+	a, err := s.PopType(data.String)
+	if err != nil {
+		return err
+	}
+	s.Push(data.NewString(a.Str + b.Str))
+	return nil
+}
+
+// split pops a number and a string
+func split(d *data.Dictionary, s *data.Stack) error {
+	num, err := s.PopType(data.Number)
+	if err != nil {
+		return err
+	}
+	str, err := s.PopType(data.String)
+	if err != nil {
+		return err
+	}
+	split := int(num.Number)
+	if split > len(str.Str) {
+		split = len(str.Str)
+	}
+	s.Push(data.NewString(str.Str[:split]))
+	s.Push(data.NewString(str.Str[split:]))
 	return nil
 }
