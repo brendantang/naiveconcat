@@ -8,11 +8,11 @@ import (
 )
 
 const (
-	wordRunes            = "abcdefghijjklmnopqrstuvwxyz+-*/=_" // wordRunes are legal characters in a word name.
-	stringDelimiter rune = '"'                                 // delimiter that opens or closes a string.
-	stringEscaper   rune = '\\'                                // delimiter that escapes the following character in a string.
-	quotationOpener rune = '{'                                 // delimiter that opens a quotation.
-	quotationCloser rune = '}'                                 // delimiter that closes a quotation.
+	wordRunes            = "abcdefghijjklmnopqrstuvwxyz+-*/=_><" // wordRunes are legal characters in a word name.
+	stringDelimiter rune = '"'                                   // delimiter that opens or closes a string.
+	stringEscaper   rune = '\\'                                  // delimiter that escapes the following character in a string.
+	quotationOpener rune = '{'                                   // delimiter that opens a quotation.
+	quotationCloser rune = '}'                                   // delimiter that closes a quotation.
 )
 
 // Lexer scans an input src and emits a stream of lexed tokens.
@@ -23,6 +23,10 @@ type Lexer struct {
 	behavior lexingFn   // function defining lexing behavior.
 	startPos int        // selection start position.
 	endPos   int        // selection end position.
+}
+
+func (l *Lexer) String() string {
+	return fmt.Sprintf("Lexing source: `%.50s...`\nCurrent selection: `%s`\n", l.src, l.selection())
 }
 
 // NewLexer returns a *Lexer with initialized Out and Errs channels.
