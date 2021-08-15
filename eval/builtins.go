@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/brendantang/naiveconcat/data"
 	"sort"
+	"strings"
 )
 
 // CoreDict returns a data.Dictionary with word bindings for built-in primitive
@@ -52,6 +53,7 @@ func CoreDict() *data.Dictionary {
 			// STRINGS
 			"join":  data.NewProc(join),  // pop two strings, combine them, push the result.
 			"split": data.NewProc(split), // pop an index number and a string, push the two strings made by splitting at the index.
+			"find":  data.NewProc(find),
 		},
 	)
 }
@@ -358,7 +360,8 @@ func join(d *data.Dictionary, s *data.Stack) error {
 	return nil
 }
 
-// split pops a number and a string
+// split pops an index number and a string and pushes two new strings made by splitting
+// the string at the index.
 func split(d *data.Dictionary, s *data.Stack) error {
 	num, err := s.PopType(data.Number)
 	if err != nil {
@@ -374,5 +377,21 @@ func split(d *data.Dictionary, s *data.Stack) error {
 	}
 	s.Push(data.NewString(str.Str[:split]))
 	s.Push(data.NewString(str.Str[split:]))
+	return nil
+}
+
+// find pops a substring and a string, and pushes the starting index of the
+// first instance of the substring in the string, or -1 if it is not found.
+func find(d *data.Dictionary, s *data.Stack) error {
+	substr, err := s.PopType(data.String)
+	if err != nil {
+		return err
+	}
+	str, err := s.PeekType(data.String)
+	if err != nil {
+		return err
+	}
+	s.Push(substr)
+	s.Push(data.NewNumber(float64(strings.Index(str.Str, substr.Str))))
 	return nil
 }

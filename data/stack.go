@@ -52,6 +52,19 @@ func (s *Stack) Peek() (Value, error) {
 	return s.data[0], nil
 }
 
+// PeekType takes a Type and Peeks the top value. Error reports if the stack is
+// empty or if the value doesn't match the given type.
+func (s *Stack) PeekType(t Type) (Value, error) {
+	val, err := s.Peek()
+	if err != nil {
+		return val, err
+	}
+	if val.Type != t {
+		return val, NewTypeErr(val, t)
+	}
+	return val, nil
+}
+
 func (s *Stack) String() string {
 	var strs []string
 	for _, val := range s.data {
