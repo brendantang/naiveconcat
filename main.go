@@ -14,7 +14,7 @@ import (
 	"os"
 )
 
-//go:embed prelude.naiveconcat
+//go:embed interpret/prelude.naiveconcat
 var prelude string
 
 func main() {

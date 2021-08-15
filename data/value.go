@@ -136,19 +136,28 @@ func NewBoolean(b bool) Value {
 // A TypeErr indicates when a naiveconcat Value does not have its expected type.
 type TypeErr struct {
 	val      Value
-	expected Type
+	expected []Type
 }
 
 // NewTypeErr returns a TypeErr.
-func NewTypeErr(val Value, expected Type) error {
+func NewTypeErr(val Value, expected ...Type) error {
 	return TypeErr{val, expected}
 }
 
 func (e TypeErr) Error() string {
+	var want string
+	for i, typ := range e.expected {
+		if i == 0 {
+			want = fmt.Sprint(typ)
+		} else {
+			want = want + " or " + fmt.Sprint(typ)
+		}
+
+	}
 	return fmt.Sprintf(
 		"type error: expected '%s' (%s) to be type %s ",
 		e.val,
 		e.val.Type,
-		e.expected,
+		want,
 	)
 }

@@ -3,6 +3,7 @@ package eval
 import (
 	"fmt"
 	"github.com/brendantang/naiveconcat/data"
+	"os"
 	"sort"
 	"strings"
 )
@@ -13,17 +14,23 @@ func CoreDict() *data.Dictionary {
 	return data.NewDictionary(
 		nil,
 		map[string]data.Value{
+			"exit": data.NewProc(exit),
 			// IO
 			"say":   data.NewProc(say),       // pop a value and print it
 			"stack": data.NewProc(showStack), // print the whole stack
 			"words": data.NewProc(showDict),  // print all word definitions
 
-			// MATH
-			"+": data.NewProc(add),      // pop two numbers and push their sum
-			"-": data.NewProc(subtract), // pop a, pop b, push b - a
-			"*": data.NewProc(multiply), // pop two numbers and push their product
-			"/": data.NewProc(divide),   // pop a, pop b, push b divided by a
-			"=": data.NewProc(equal),    // pop two numbers and push whether they're equal
+			// OPERATORS AND COMPARISON
+			"+":      data.NewProc(add),      // pop two numbers and push their sum
+			"-":      data.NewProc(subtract), // pop a, pop b, push b - a
+			"*":      data.NewProc(multiply), // pop two numbers and push their product
+			"/":      data.NewProc(divide),   // pop a, pop b, push b divided by a
+			"=":      data.NewProc(equal),    // pop two numbers and push whether they're equal
+			"<":      data.NewProc(lessThan),
+			">":      data.NewProc(greaterThan),
+			"<=":     data.NewProc(lessThanOrEq),
+			">=":     data.NewProc(greaterThanOrEq),
+			"length": data.NewProc(length), // push length of the quotation or string on top of the stack
 
 			// BOOLEANS
 			"true":  data.NewBoolean(true),  // TRUE literal
@@ -34,7 +41,6 @@ func CoreDict() *data.Dictionary {
 			"then":  data.NewProc(then),     // pop a bool and x, evaluate x if the bool is TRUE
 
 			// QUOTATIONS
-			"length": data.NewProc(length),       // push length of the quotation on top of the stack
 			"lop":    data.NewProc(lop),          // pop quotation { a b c ... }, push { b c ... }, push a
 			"append": data.NewProc(appendToQuot), // pop quotation { a b c ... }, pop value d, push { a b c ... d }
 
@@ -56,6 +62,12 @@ func CoreDict() *data.Dictionary {
 			"find":  data.NewProc(find),
 		},
 	)
+}
+
+func exit(d *data.Dictionary, s *data.Stack) error {
+	fmt.Println("Goodbye!")
+	os.Exit(0)
+	return nil
 }
 
 // IO.
@@ -158,6 +170,58 @@ func equal(d *data.Dictionary, s *data.Stack) error {
 	return nil
 }
 
+func lessThan(d *data.Dictionary, s *data.Stack) error {
+	a, err := s.PopType(data.Number)
+	if err != nil {
+		return err
+	}
+	b, err := s.PopType(data.Number)
+	if err != nil {
+		return err
+	}
+	s.Push(data.NewBoolean(a.Number < b.Number))
+	return nil
+}
+
+func greaterThan(d *data.Dictionary, s *data.Stack) error {
+	a, err := s.PopType(data.Number)
+	if err != nil {
+		return err
+	}
+	b, err := s.PopType(data.Number)
+	if err != nil {
+		return err
+	}
+	s.Push(data.NewBoolean(a.Number > b.Number))
+	return nil
+}
+
+func lessThanOrEq(d *data.Dictionary, s *data.Stack) error {
+	a, err := s.PopType(data.Number)
+	if err != nil {
+		return err
+	}
+	b, err := s.PopType(data.Number)
+	if err != nil {
+		return err
+	}
+	s.Push(data.NewBoolean(a.Number <= b.Number))
+	return nil
+}
+
+func greaterThanOrEq(d *data.Dictionary, s *data.Stack) error {
+	a, err := s.PopType(data.Number)
+	if err != nil {
+		return err
+	}
+	b, err := s.PopType(data.Number)
+	if err != nil {
+		return err
+	}
+	s.Push(data.NewBoolean(a.Number >= b.Number))
+	return nil
+}
+
 // Booleans.
 
 // not pops a boolean and pushes its negation.
@@ -225,14 +289,18 @@ func then(d *data.Dictionary, s *data.Stack) error {
 // length returns the length of the quotation on top of the stack without
 // popping it.
 func length(d *data.Dictionary, s *data.Stack) error {
-	quot, err := s.Peek()
+	val, err := s.Peek()
 	if err != nil {
 		return err
 	}
-	if quot.Type != data.Quotation {
-		return data.NewTypeErr(quot, data.Quotation)
+	switch val.Type {
+	case data.Quotation:
+		s.Push(data.NewNumber(float64(len(val.Quotation))))
+	case data.String:
+		s.Push(data.NewNumber(float64(len(val.Str))))
+	default:
+		return data.NewTypeErr(val, data.Quotation)
 	}
-	s.Push(data.NewNumber(float64(len(quot.Quotation))))
 
 	return nil
 }
@@ -374,6 +442,9 @@ func split(d *data.Dictionary, s *data.Stack) error {
 	split := int(num.Number)
 	if split > len(str.Str) {
 		split = len(str.Str)
+	}
+	if split < 0 {
+		split = 0
 	}
 	s.Push(data.NewString(str.Str[:split]))
 	s.Push(data.NewString(str.Str[split:]))
