@@ -37,3 +37,30 @@
     "b" let
     a b
 } "swap" define
+
+
+
+-- STRINGS
+
+
+{
+  find "index" let
+  "delimiter" let
+  "original" let
+
+  { 
+    original index split 
+    delimiter length swap drop
+    split swap drop
+    swap {} append append
+  } index 0 >= then -- apply
+  --{{} append} index 0 < then apply
+} "split_on" define
+
+
+{
+  "delimiter" let
+  delimiter find
+} "split_each" define
+
+

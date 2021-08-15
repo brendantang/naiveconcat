@@ -11,20 +11,18 @@ func TestInterpretBasics(t *testing.T) {
 var basicTestCases = []interpretTestCase{
 	{
 		"some values",
-		`-- From '--' to the end of a line is a comment.
-
-		"foo" 2 "bar"   -- Literal values get pushed on the stack.
-
-		42 2 *          -- The '*' word pops two numbers off the top of the stack,
-		                -- multiplies them together, and pushes the result back on the stack.
-
-		say	        -- The 'say' word pops the top value off the stack and prints it.
-		`,
+		[]string{
+			`-- From '--' to the end of a line is a comment.`,
+			`"foo" 2 "bar"   -- Literal values get pushed on the stack`,
+			`42 2 *          -- The '*' word pops two numbers off the top of the stack,
+					-- multiplies them together, and pushes the result back on the stack.`,
+			`say	        -- The 'say' word pops the top value off the stack and prints it.`,
+		},
 		"84",
 	},
 	{
 		"use `then` to implement `if` with consequent and alternative",
-		`
+		[]string{`
 		{ 
 		  "predicate" let 
 		  "alternative" let
@@ -34,12 +32,12 @@ var basicTestCases = []interpretTestCase{
 		  apply
 		} "if" define
 
-		{"consequent" say} {"alternative" say} false if`,
+		{"consequent" say} {"alternative" say} false if`},
 		`"alternative"`,
 	},
 	{
 		"use `then` to implement a recursive function",
-		`
+		[]string{`
 		{
 			"x" let
 			x 0 = "done" let
@@ -48,12 +46,12 @@ var basicTestCases = []interpretTestCase{
 		} "countdown" define
 
 		5 countdown
-		`,
+		`},
 		"5\n4\n3\n2\n1\n0",
 	},
 	{
 		"fibonacci", // Not tail-recursive, will run out of memory with higher numbers
-		`
+		[]string{`
 		{ 
 			"x" let
 			{0} 0 x = then
@@ -61,12 +59,12 @@ var basicTestCases = []interpretTestCase{
 			{x 1 - fib x 2 - fib +} 0 x = 1 x = or not then apply
 		} "fib" define
 		10 fib say
-		`,
+		`},
 		"55",
 	},
 	{
 		"fibonacci tail-recursive",
-		`
+		[]string{`
 		{
 			{
 				"a" let
@@ -82,12 +80,12 @@ var basicTestCases = []interpretTestCase{
 
 		} "fib" define
 		75 fib say 
-		`,
+		`},
 		"2111485077978050",
 	},
 	{
 		"implement `each` using `then`",
-		`
+		[]string{`
 			{ -- Not tail recursive, could have bad performance?
 				"f" let
 				length "l" let
@@ -98,17 +96,17 @@ var basicTestCases = []interpretTestCase{
 				} l 0 = not then apply
 			} "each" define
 			{1 2 3} {say} each 
-			`,
+			`},
 		"1\n2\n3",
 	},
 	{
 		"import source from a file",
-		`
+		[]string{`
 		import (
 			example-import.naiveconcat
 		)
 		imported-from-example say
-		`,
+		`},
 		`"Hello from imported file"`,
 	},
 }

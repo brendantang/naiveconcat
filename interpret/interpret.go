@@ -11,6 +11,7 @@ import (
 	"github.com/brendantang/naiveconcat/parse"
 	"io/ioutil"
 	"strings"
+	"time"
 )
 
 // Interpret takes input, parses it into expressions, and then evaluates those
@@ -57,6 +58,9 @@ func Interpret(input string, d *data.Dictionary, s *data.Stack) error {
 				more = false
 				return lexErr
 			}
+		case <-time.After(5 * time.Second):
+			more = false
+			return timeout(l, p)
 		}
 	}
 	return nil
@@ -97,4 +101,8 @@ func REPL(cfg Config) error {
 
 func importErr(path string, err error) error {
 	return fmt.Errorf("error loading import '%s': %w", path, err)
+}
+
+func timeout(l *parse.Lexer, p *parse.Parser) error {
+	return fmt.Errorf("interpreter timed out\nlexer: %s", l)
 }
