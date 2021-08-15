@@ -2,6 +2,7 @@ package data
 
 import (
 	"fmt"
+	"strings"
 )
 
 // A Dictionary binds words to data. When a word is evaluated, it is substituted
@@ -33,8 +34,10 @@ func (dict *Dictionary) Get(word string) (d Value, ok bool) {
 	return
 }
 
-// Set saves the definition of a word.
+// Set saves the definition of a word. If the word name contains any white space, it
+// is replaced with a single underscore.
 func (dict *Dictionary) Set(word string, val Value) {
+	word = strings.Join(strings.Fields(word), "_")
 	dict.Bindings[word] = val
 }
 
