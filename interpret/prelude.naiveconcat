@@ -27,6 +27,21 @@
 } "each" define
 
 
+-- reduce
+-- `{1 2 3} {+} 1 reduce`
+-- => 7
+{
+  "f" let
+  "accumulator" let
+  length "l" let
+  {
+    lop "x" let
+    length "next_l" let
+    accumulator x f apply
+    {f reduce} {swap drop} next_l 0 = not if  
+  } l 0 = not then apply
+} "reduce" define
+
 
 -- STACK MANIPULATION
 
@@ -49,18 +64,19 @@
   "original" let
 
   { 
-    original index split 
-    delimiter length swap drop
+    original index split  -- split before the delimiter
+    delimiter length swap drop  -- drop the delimiter
     split swap drop
-    swap {} append append
-  } index 0 >= then -- apply
-  --{{} append} index 0 < then apply
+    swap {} append append  -- quote the two values
+  } 
+  { original {} append } 
+  index 0 >= if 
+ 
 } "split_on" define
 
 
-{
-  "delimiter" let
-  delimiter find
-} "split_each" define
+
+-- CONCAT
 
 
+{ swap {append} reduce } "concat" define

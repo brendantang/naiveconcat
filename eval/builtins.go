@@ -171,11 +171,11 @@ func equal(d *data.Dictionary, s *data.Stack) error {
 }
 
 func lessThan(d *data.Dictionary, s *data.Stack) error {
-	a, err := s.PopType(data.Number)
+	b, err := s.PopType(data.Number)
 	if err != nil {
 		return err
 	}
-	b, err := s.PopType(data.Number)
+	a, err := s.PopType(data.Number)
 	if err != nil {
 		return err
 	}
@@ -184,11 +184,11 @@ func lessThan(d *data.Dictionary, s *data.Stack) error {
 }
 
 func greaterThan(d *data.Dictionary, s *data.Stack) error {
-	a, err := s.PopType(data.Number)
+	b, err := s.PopType(data.Number)
 	if err != nil {
 		return err
 	}
-	b, err := s.PopType(data.Number)
+	a, err := s.PopType(data.Number)
 	if err != nil {
 		return err
 	}
@@ -197,11 +197,11 @@ func greaterThan(d *data.Dictionary, s *data.Stack) error {
 }
 
 func lessThanOrEq(d *data.Dictionary, s *data.Stack) error {
-	a, err := s.PopType(data.Number)
+	b, err := s.PopType(data.Number)
 	if err != nil {
 		return err
 	}
-	b, err := s.PopType(data.Number)
+	a, err := s.PopType(data.Number)
 	if err != nil {
 		return err
 	}
@@ -210,11 +210,11 @@ func lessThanOrEq(d *data.Dictionary, s *data.Stack) error {
 }
 
 func greaterThanOrEq(d *data.Dictionary, s *data.Stack) error {
-	a, err := s.PopType(data.Number)
+	b, err := s.PopType(data.Number)
 	if err != nil {
 		return err
 	}
-	b, err := s.PopType(data.Number)
+	a, err := s.PopType(data.Number)
 	if err != nil {
 		return err
 	}
@@ -321,11 +321,11 @@ func lop(d *data.Dictionary, s *data.Stack) error {
 
 // appendToQuot adds a value to the end of a quotation.
 func appendToQuot(d *data.Dictionary, s *data.Stack) error {
-	quot, err := s.PopType(data.Quotation)
+	val, err := s.Pop()
 	if err != nil {
 		return err
 	}
-	val, err := s.Pop()
+	quot, err := s.PopType(data.Quotation)
 	if err != nil {
 		return err
 	}

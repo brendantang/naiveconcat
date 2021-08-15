@@ -24,10 +24,7 @@ var preludeTestCases = []interpretTestCase{
 			`","`,
 			`split_on say`,
 		},
-		`
-{"foo" "bar,baz"}
-{"Won't find the delimiter"}
-`,
+		"{\"foo\" \"bar,baz\"}\n{\"Won't find the delimiter\"}",
 	},
 	{
 		"split_each",

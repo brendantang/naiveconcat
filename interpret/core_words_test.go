@@ -39,7 +39,7 @@ var coreWordTestCases = []interpretTestCase{
 	},
 	{
 		"append to a quotation",
-		[]string{`4 {1 2 3} append say`},
+		[]string{`{1 2 3} 4 append say`},
 		`{1 2 3 4}`,
 	},
 }
