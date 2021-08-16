@@ -25,7 +25,7 @@ func testInterpret(t *testing.T, cases []interpretTestCase) {
 		// interpret the test case
 		d, s := eval.CoreDict(), data.NewStack()
 		for i, line := range c.src {
-			t.Log(s)
+			//t.Log(s)
 			err = Interpret(line+"\r", d, s)
 			if err != nil {
 				failInterpretTest(t, c, fmt.Sprintf("interpreter error on line %d: %s", i+1, line), err.Error())
