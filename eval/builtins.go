@@ -3,6 +3,7 @@ package eval
 import (
 	"fmt"
 	"github.com/brendantang/naiveconcat/data"
+	"io/ioutil"
 	"os"
 	"sort"
 	"strings"
@@ -14,7 +15,10 @@ func CoreDict() *data.Dictionary {
 	return data.NewDictionary(
 		nil,
 		map[string]data.Value{
-			"exit": data.NewProc(exit),
+			// SYSTEM
+			"exit":      data.NewProc(exit),     // exit
+			"read_file": data.NewProc(readFile), // pop a path and push the entire contents of the file at that path
+
 			// IO
 			"say":   data.NewProc(say),       // pop a value and print it
 			"stack": data.NewProc(showStack), // print the whole stack
@@ -46,27 +50,41 @@ func CoreDict() *data.Dictionary {
 
 			// DICTIONARY MANIPULATION
 			"let":    data.NewProc(let),    // pop a string and a value, make a word named by string, defined by value
-			"define": data.NewProc(define), // pop a string and x. make a word named by string, defined by proc that evals to x.
+			"define": data.NewProc(define), // pop a string and x. make a word named by string, defined by proc that evals to x
 
 			// STACK MANIPULATION
 			"dup":    data.NewProc(dup),    // pop a, push a, push a
 			"drop":   data.NewProc(drop),   // pop a, discard it
-			"lambda": data.NewProc(lambda), // pop x, push a proc that evals to x.
+			"lambda": data.NewProc(lambda), // pop x, push a proc that evals to x
 
 			// APPLY
-			"apply": data.NewProc(apply), // pop x. if x is a quotation, eval each item. otherwise, eval x.
+			"apply": data.NewProc(apply), // pop x. if x is a quotation, eval each item. otherwise, eval x
 
 			// STRINGS
-			"join":  data.NewProc(join),  // pop two strings, combine them, push the result.
-			"split": data.NewProc(split), // pop an index number and a string, push the two strings made by splitting at the index.
-			"find":  data.NewProc(find),
+			"join":  data.NewProc(join),  // pop two strings, combine them, push the result
+			"split": data.NewProc(split), // pop an index number and a string, push the two strings made by splitting at the index
+			"find":  data.NewProc(find),  // pop a substring and a string, and push the index of the first instance of the substring in the string
 		},
 	)
 }
 
+// System.
+
 func exit(d *data.Dictionary, s *data.Stack) error {
-	fmt.Println("Goodbye!")
 	os.Exit(0)
+	return nil
+}
+
+func readFile(d *data.Dictionary, s *data.Stack) error {
+	path, err := s.PopType(data.String)
+	if err != nil {
+		return err
+	}
+	contents, err := ioutil.ReadFile(path.Str)
+	if err != nil {
+		return err
+	}
+	s.Push(data.NewString(string(contents)))
 	return nil
 }
 
