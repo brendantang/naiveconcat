@@ -88,11 +88,11 @@ var basicTestCases = []interpretTestCase{
 		[]string{`
 			{ -- Not tail recursive, could have bad performance?
 				"f" let
-				length "l" let
+				dup length "l" let
 				{
 					lop 
 					f apply
-					{f each}  length 0 = not  then apply
+					{f each}  dup length 0 = not  then apply
 				} l 0 = not then apply
 			} "each" define
 			{1 2 3} {say} each 

@@ -18,11 +18,11 @@
 -- Not tail recursive, could have bad performance
 {
     "f" let
-    length "l" let
+    dup length "l" let
     {
         lop 
         f apply
-        {f each}  length 0 = not  then apply
+        {f each}  dup length 0 = not  then apply
     } l 0 = not   then apply
 } "each" define
 
@@ -33,10 +33,10 @@
 {
   "f" let
   "accumulator" let
-  length "l" let
+  dup length "l" let
   {
     lop "x" let
-    length "next_l" let
+    dup length "next_l" let
     accumulator x f apply
     {f reduce} {swap drop} next_l 0 = not if  
   } l 0 = not then apply
@@ -58,25 +58,60 @@
 -- STRINGS
 
 
+{ split swap drop } "trim_front" define
+-- > "Foobar" 2 trim_front
+-- ["obar"]
+
+{ find 0 >= } "has_substring?" define
+-- > "Brendan" "end" has_substring?
+-- [ TRUE ]
+
 {
-  find "index" let
   "delimiter" let
   "original" let
+  delimiter length "delimiter_length" let
 
   { 
+    original delimiter find "index" let
     original index split  -- split before the delimiter
-    delimiter length swap drop  -- drop the delimiter
-    split swap drop
-    swap {} append append  -- quote the two values
+    delimiter_length trim_front  -- drop the delimiter
+    "second part" let
+    "first part" let
+    {} first_part append second_part append
   } 
-  { original {} append } 
-  index 0 >= if 
+  { {} original append } 
+  original delimiter has_substring? if
  
 } "split_on" define
 
+
+{
+  "delimiter" let
+  "original" let
+  delimiter length "delimiter_length" let
+
+  { 
+    original delimiter find "index" let
+    original index split  -- split before the delimiter
+    delimiter_length trim_front -- drop the delimiter
+    "second part" let
+    "first part" let
+    {} first_part append 
+    second_part
+    { -- split_each the second part and concat the result
+      delimiter split_each concat
+    }
+    { -- or just append the second part if no more splits necessary
+      append
+    }
+    second_part delimiter has_substring? if
+  } 
+  { {} original append } 
+  original delimiter has_substring? if
+} "split_each" define
 
 
 -- CONCAT
 
 
-{ swap {append} reduce } "concat" define
+{ swap { append } reduce } "concat" define

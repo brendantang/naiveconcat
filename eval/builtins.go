@@ -30,7 +30,7 @@ func CoreDict() *data.Dictionary {
 			">":      data.NewProc(greaterThan),
 			"<=":     data.NewProc(lessThanOrEq),
 			">=":     data.NewProc(greaterThanOrEq),
-			"length": data.NewProc(length), // push length of the quotation or string on top of the stack
+			"length": data.NewProc(length), // pop a quotation or string and push its length
 
 			// BOOLEANS
 			"true":  data.NewBoolean(true),  // TRUE literal
@@ -286,10 +286,9 @@ func then(d *data.Dictionary, s *data.Stack) error {
 
 // Quotation manipulation.
 
-// length returns the length of the quotation on top of the stack without
-// popping it.
+// length pops a quotation or string and pushes its length.
 func length(d *data.Dictionary, s *data.Stack) error {
-	val, err := s.Peek()
+	val, err := s.Pop()
 	if err != nil {
 		return err
 	}
@@ -458,11 +457,10 @@ func find(d *data.Dictionary, s *data.Stack) error {
 	if err != nil {
 		return err
 	}
-	str, err := s.PeekType(data.String)
+	str, err := s.PopType(data.String)
 	if err != nil {
 		return err
 	}
-	s.Push(substr)
 	s.Push(data.NewNumber(float64(strings.Index(str.Str, substr.Str))))
 	return nil
 }
