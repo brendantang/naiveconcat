@@ -97,11 +97,12 @@
     "second part" let
     "first part" let
     {} first_part append 
-    second_part
     { -- split_each the second part and concat the result
+      second_part
       delimiter split_each concat
     }
     { -- or just append the second part if no more splits necessary
+      second_part
       append
     }
     second_part delimiter has_substring? if
