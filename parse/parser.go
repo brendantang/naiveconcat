@@ -2,8 +2,9 @@ package parse
 
 import (
 	"fmt"
-	"github.com/brendantang/naiveconcat/data"
 	"strconv"
+
+	"github.com/brendantang/naiveconcat/data"
 )
 
 // The Parser receives from a channel of tokens and parses them into naiveconcat
@@ -25,6 +26,8 @@ func NewParser(input chan token) *Parser {
 
 }
 
+// Run listens for tokens on the in channel, sends naiveconcat values on the
+// Out channel to be evaluated, and sends parsing errors on the Errs channel.
 func (p *Parser) Run() {
 loop:
 	for tok := range p.in {

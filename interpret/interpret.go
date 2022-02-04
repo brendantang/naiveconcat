@@ -6,17 +6,20 @@ package interpret
 import (
 	"bufio"
 	"fmt"
-	"github.com/brendantang/naiveconcat/data"
-	"github.com/brendantang/naiveconcat/eval"
-	"github.com/brendantang/naiveconcat/parse"
 	"io/ioutil"
 	"strings"
 	"time"
+
+	"github.com/brendantang/naiveconcat/data"
+	"github.com/brendantang/naiveconcat/eval"
+	"github.com/brendantang/naiveconcat/parse"
 )
 
 // Interpret takes input, parses it into expressions, and then evaluates those
 // expressions to mutate the dictionary and stack.
 func Interpret(input string, d *data.Dictionary, s *data.Stack) error {
+
+	// First interpret any imported files in order
 	if strings.HasPrefix(strings.TrimLeft(input, "\t\n\r "), "import (") {
 		split := strings.SplitN(input, ")", 2)
 		imports := strings.Fields(split[0])[2:] // drop the "import ("
@@ -32,12 +35,17 @@ func Interpret(input string, d *data.Dictionary, s *data.Stack) error {
 		}
 		input = split[1]
 	}
+
+	// Concurrently run the lexer and parser
 	l := parse.NewLexer(input)
 	p := parse.NewParser(l.Out)
 	go l.Run()
 	go p.Run()
+
 	for more := true; more; {
 		select {
+
+		// Evaluate the next value from the parser
 		case val, ok := <-p.Out:
 			if !ok {
 				more = false
@@ -48,16 +56,22 @@ func Interpret(input string, d *data.Dictionary, s *data.Stack) error {
 				more = false
 				return evalErr
 			}
+
+		// Handle a parsing error
 		case parseErr := <-p.Errs:
 			if parseErr != nil {
 				more = false
 				return parseErr
 			}
+
+		// Handle a lexing error
 		case lexErr := <-l.Errs:
 			if lexErr != nil {
 				more = false
 				return lexErr
 			}
+
+		// If both parser and lexer idle for 5 seconds, time out
 		case <-time.After(5 * time.Second):
 			more = false
 			return timeout(l, p)
@@ -79,14 +93,15 @@ type Config struct {
 func REPL(cfg Config) error {
 	dict, s := cfg.InitialDict, cfg.InitialStack
 	for true {
-		// read a line from std in
+
+		// Read a line from std in
 		fmt.Print(cfg.Prompt)
 		input, err := cfg.Input.ReadString('\n')
 		if err != nil {
 			return fmt.Errorf("error reading input: %w", err)
 		}
 
-		// interpret the line
+		// Interpret the line
 		err = Interpret(input, dict, s)
 		if err != nil {
 			return err
