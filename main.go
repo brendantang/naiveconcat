@@ -6,12 +6,13 @@ import (
 	"bufio"
 	_ "embed"
 	"flag"
-	"github.com/brendantang/naiveconcat/data"
-	"github.com/brendantang/naiveconcat/eval"
-	"github.com/brendantang/naiveconcat/interpret"
 	"io/ioutil"
 	"log"
 	"os"
+
+	"github.com/brendantang/naiveconcat/data"
+	"github.com/brendantang/naiveconcat/eval"
+	"github.com/brendantang/naiveconcat/interpret"
 )
 
 //go:embed interpret/prelude.naiveconcat
@@ -40,11 +41,11 @@ func main() {
 	if filepath != "" {
 		content, err := ioutil.ReadFile(filepath)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("error reading input file: %s", err)
 		}
 		err = interpret.Interpret(string(content), dict, stack)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("interpreter error: %s", err)
 		}
 	} else {
 		log.Fatal(interpret.REPL(cfg))

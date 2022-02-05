@@ -2,6 +2,7 @@ package eval
 
 import (
 	"fmt"
+
 	"github.com/brendantang/naiveconcat/data"
 )
 
@@ -19,18 +20,18 @@ func Eval(val data.Value, d *data.Dictionary, s *data.Stack) error {
 	case data.Word:
 		definition, ok := d.Get(val.Word)
 		if !ok {
-			return undefinedError(val)
+			return Error{val, d, s, undefinedError(val)}
 		}
 		err := Eval(definition, d, s)
 		if err != nil {
-			return err
+			return Error{val, d, s, err}
 		}
 
 	// procedures are executed
 	case data.Proc:
 		err := val.Proc.Execute(d, s)
 		if err != nil {
-			return err
+			return Error{val, d, s, err}
 		}
 	}
 
@@ -39,4 +40,17 @@ func Eval(val data.Value, d *data.Dictionary, s *data.Stack) error {
 
 func undefinedError(w data.Value) error {
 	return fmt.Errorf("the word '%s' is not defined", w.Word)
+}
+
+// Error wraps an error with information about the value that failed to
+// evaluate, the stack, and the dictionary.
+type Error struct {
+	Value data.Value
+	Dict  *data.Dictionary
+	Stack *data.Stack
+	Err   error
+}
+
+func (err Error) Error() string {
+	return fmt.Sprintf("error evaluating '%s': %s", err.Value, err.Err)
 }
