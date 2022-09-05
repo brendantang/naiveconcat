@@ -1,6 +1,6 @@
 module github.com/brendantang/naiveconcat
 
-go 1.16
+go 1.19
 
 require (
 	github.com/yuin/goldmark v1.4.0 // indirect
